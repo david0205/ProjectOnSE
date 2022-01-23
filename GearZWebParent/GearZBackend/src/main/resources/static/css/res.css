@@ -1,0 +1,42 @@
+@charset "ISO-8859-1";
+/*------------navigation-left-bar--------*/
+
+@media screen and (max-width: 800px) {
+    .user-profile-content {
+        flex-direction: column;
+        padding: 15px 0;
+    }
+    .user-profile-email {
+        font-size: 11px;
+    }
+    .btn-create {
+        font-size: 12px;
+        padding: 3px;
+    }
+    .btn-create i {
+        font-size: 14px;
+        margin-right: 5px;
+    }
+    .nav-left {
+        width: 100px;
+        padding: 3px;
+    }
+    .navlink-left {
+        align-items: center;
+        margin: 0;
+        padding: 12px 3px;
+        font-size: 10px;
+    }
+    .navlink-left i {
+        font-size: 15px;
+    }
+    .nav-item:first-child {
+        padding: 10px;
+    }
+    .nav-item:nth-child(2) .nav-link {
+        padding: 0;
+    }
+    .navbar-toggler {
+        font-size: 12px;
+    }
+}

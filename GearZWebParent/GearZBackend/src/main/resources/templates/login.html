@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html xmlns:th="http://thymeleaf.org">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<meta name="viewport"
+		content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+	
+	<!-- CSS -->
+	<link rel="stylesheet" type="text/css" th:href="@{/webjars/bootstrap/css/bootstrap.min.css}">
+	<link rel="stylesheet" type="text/css" th:href="@{/webjars/font-awesome/css/all.css}">
+	<link rel="stylesheet" type="text/css" th:href="@{/css/login.css}">
+	
+	<title>Login - GearZ</title>
+	
+</head>
+<body>
+	<div th:if="${param.error}" class="alert alert-danger text-center mx-auto mt-5" style="width: 500px" role="alert">
+		<i class="fas fa-exclamation-triangle"></i> [[${session.SPRING_SECURITY_LAST_EXCEPTION.message}]]
+	</div>
+	
+	<div class="container">
+        <div class="card card-container">
+            <img th:src="@{/img/gearz-logo-blue-2x.png}" />
+            <span class="p-3"></span>
+            <p class="text-center">Access to Control Panel</p>
+            
+            <form class="form-signin" th:action="@{/login}" method="POST">
+                <input type="email" id="inputEmail" name="email" class="form-control" placeholder="Email address" required autofocus>
+                <input type="password" id="inputPassword" name="password" class="form-control" placeholder="Password" required>
+                <div id="remember" class="checkbox">
+                    <label>
+                        <input type="checkbox" name="remember-me"> Remember me
+                    </label>
+                </div>
+                <input class="btn btn-lg btn-primary btn-block btn-signin" type="submit" value="Login"/>
+            </form>
+            
+        </div>
+    </div>
+
+	<div class="text-center">
+		<p>Copyright &copy; GearZ</p>
+	</div>
+</body>
+</html>

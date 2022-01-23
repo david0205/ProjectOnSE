@@ -1,0 +1,309 @@
+@charset "ISO-8859-1";
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+}
+
+.adduser-container {
+    background-color: #fff;
+    width: 600px;
+    height: 800px;
+    border: 1px solid #dddddd;
+    padding: 0;
+    box-shadow: 5px 5px 30px rgba(0, 0, 0, 0.2);
+    position: relative;
+}
+
+.adduser-top {
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    background-color: #353A46;
+    color: #fff;
+    padding: 15px 0;
+}
+
+.user-pic {
+    height: 200px;
+    padding: 15px 120px;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+}
+
+.user-pic img {
+    height: 100%;
+    border: 1px solid black;
+}
+
+.picture {
+    justify-content: right;
+    text-align: right;
+    width: 100%;
+    height: 100%;
+    padding-right: 15px;
+}
+
+.select-picture {
+    display: flex;
+    align-items: flex-end;
+    text-align: center;
+}
+
+.select-pic {
+    border: 1px solid #dddddd;
+    border-radius: 8px;
+    background-color: white;
+    color: black;
+    font-weight: bold;
+    font-size: 12px;
+    padding: 3px;
+    transition: all 0.5s ease;
+}
+
+.select-pic:hover {
+    background-color: black;
+    color: white;
+}
+
+.inputs {
+    flex-direction: column;
+    padding: 0px 60px 0px;
+}
+
+.form-group {
+    position: relative;
+    margin-bottom: 1.3rem
+}
+
+.form-control-placeholder {
+    position: absolute;
+    top: 0;
+    padding: 5px 0 0 10px;
+    transition: all 500ms;
+    opacity: 0.5;
+    color: black;
+}
+
+.form-control:focus+.form-control-placeholder,
+.form-control:valid+.form-control-placeholder,
+.form-control:read-only+.form-control-placeholder {
+    font-size: 75%;
+    transform: translate3d(0, -100%, 0);
+    opacity: 1;
+    top: 5px
+}
+
+.form-control {
+    border: 0;
+    border-bottom: 2px solid rgb(119, 118, 118);
+    font-size: 16px;
+    color: black;
+    border-radius: 0;
+    background-color: transparent;
+}
+
+.form-control:focus {
+    color: black;
+    background-color: transparent;
+    border-color: black;
+    border-bottom: 2px solid black;
+    box-shadow: 0 0 0 0.2rem transparent
+}
+
+
+/*-----------Radiobutton---------*/
+
+.role {
+    font-size: 20px;
+    font-weight: bold;
+}
+
+.radio-button {
+    height: 100px;
+}
+
+.radio-button2 {
+    height: 100px;
+    justify-content: center;
+    text-align: center;
+}
+
+.role-wrapper {
+    flex-direction: column;
+    background: #fff;
+    height: 150px;
+    width: 100%;
+    align-items: center;
+    justify-content: space-evenly;
+    border-radius: 5px;
+    padding: 0px 100px;
+}
+
+.role-wrapper .option {
+    background: #fff;
+    height: 70%;
+    width: 30%;
+    display: flex;
+    align-items: center;
+    justify-content: space-evenly;
+    margin: 0 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    border: 2px solid lightgrey;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.checkbox1 {
+    position: absolute;
+    left: 126px;
+    z-index: 10;
+    transform: translateY(37%);
+    background-color: #fff;
+}
+
+.checkbox2 {
+    position: absolute;
+    left: 255px;
+    z-index: 10;
+    transform: translateY(37%);
+    background-color: #fff;
+}
+
+.checkbox3 {
+    position: absolute;
+    left: 394px;
+    z-index: 10;
+    transform: translateY(37%);
+    background-color: #fff;
+}
+
+.checkbox4 {
+    position: absolute;
+    left: 176px;
+    z-index: 10;
+    transform: translateY(37%);
+    background-color: #fff;
+}
+
+.checkbox5 {
+    position: absolute;
+    left: 325px;
+    z-index: 10;
+    transform: translateY(37%);
+    background-color: #fff;
+}
+
+.role-wrapper .option .square {
+    height: 20px;
+    width: 20px;
+    background: #d9d9d9;
+    border-radius: 5%;
+    position: relative;
+}
+
+.role-wrapper .option .square::before {
+    position: absolute;
+    content: "";
+    top: 4px;
+    left: 4px;
+    width: 12px;
+    height: 12px;
+    background: #c80e0e;
+    border-radius: 16%;
+    opacity: 0;
+    transform: scale(1.5);
+    transition: all 0.3s ease
+}
+
+input[type="radio"] {
+    display: none
+}
+
+#radio-button-1:checked:checked~.radio-button-1,
+#radio-button-2:checked:checked~.radio-button-2,
+#radio-button-3:checked:checked~.radio-button-3,
+#radio-button-4:checked:checked~.radio-button-4,
+#radio-button-5:checked:checked~.radio-button-5 {
+    border-color: #d14444;
+    background: #e63838
+}
+
+#radio-button-1:checked:checked~.radio-button-1 .square,
+#radio-button-2:checked:checked~.radio-button-2 .square,
+#radio-button-3:checked:checked~.radio-button-3 .square,
+#radio-button-4:checked:checked~.radio-button-4 .square,
+#radio-button-5:checked:checked~.radio-button-5 .square {
+    background: #fff
+}
+
+#radio-button-1:checked:checked~.radio-button-1 .square::before,
+#radio-button-2:checked:checked~.radio-button-2 .square::before,
+#radio-button-3:checked:checked~.radio-button-3 .square::before,
+#radio-button-4:checked:checked~.radio-button-4 .square::before,
+#radio-button-5:checked:checked~.radio-button-5 .square::before {
+    opacity: 1;
+    transform: scale(1)
+}
+
+.role-wrapper .option span {
+    font-size: 15px;
+    color: #808080
+}
+
+#radio-button-1:checked:checked~.radio-button-1 span,
+#radio-button-2:checked:checked~.radio-button-2 span,
+#radio-button-3:checked:checked~.radio-button-3 span,
+#radio-button-4:checked:checked~.radio-button-4 span,
+#radio-button-5:checked:checked~.radio-button-5 span {
+    color: #fff
+}
+
+
+/*------------Checkbox------------*/
+
+.checkbox-container {
+    text-align: center;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+}
+
+.checkbox-label {
+    margin: 0 10px;
+}
+
+input[type=checkbox] {
+    height: 22px;
+    width: 22px;
+}
+
+
+/*==========Buttons------------*/
+
+.buttons {
+    padding: 15px 150px 0px;
+    margin-top: 15px;
+    text-align: center;
+    justify-content: space-between;
+    align-items: center;
+    border-top: 1px solid #dddddd;
+}
+
+.button {
+    width: 120px;
+    height: 50px;
+    border: 1px solid #ccc;
+    border-radius: 20px;
+    font-weight: bold;
+    transition: all 0.5s ease;
+}
+
+.button:hover {
+    background-color: black;
+    color: #fff;
+}

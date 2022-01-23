@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html xmlns:th="http://thymeleaf.org">
+<head>
+    <th:block th:replace="fragments :: page_head('Checkout', 'none')"></th:block>
+    <link th:href="@{/css/checkout.css}" rel="stylesheet">
+    <script>
+		var csrfHeaderName = "[[${_csrf.headerName}]]"
+        var csrfToken = "[[${_csrf.token}]]"
+	</script>
+</head>
+<body>
+    <div id="page">
+        <header th:replace="fragments :: header"></header>
+
+		<main class="bg_gray">
+
+            <div class="container margin_30">
+                <div class="page_header">
+                    <h1>Checkout</h1>
+                </div>
+                <!-- /page_header -->
+                <div class="row">
+                    <div class="col-lg-4 col-md-6">
+                        <div class="step first">
+                            <h3>1. User Info and Address</h3>
+                            <div class="box_general summary">
+                                <ul>
+                                    <li><b>Ship to: </b></li>
+                                    <li><div th:utext="${shippingAddress}"></div></li>
+                                </ul>
+                                <ul>
+                                    <li>Estimated Delivery Time: [[${checkoutInfo.estimatedDeliveryDays}]] day(s)</li>
+                                </ul>
+                                <ul>
+                                    <li>
+                                        Expected Complete Delivery: [[${#dates.format(checkoutInfo.deliveryCompleteDate, 'E, dd MMM yyyy')}]]
+                                    </li>
+                                </ul>
+                                <a th:href="@{/address_book(redirect=checkout)}" class="btn_1 full-width">Ship to another address</a>
+                            </div>
+                        </div>
+                        <!-- /step -->
+                    </div>
+                    <div class="col-lg-4 col-md-6">
+                        <div class="step middle payments">
+                            <h3>2. Payment Method</h3>
+                            <div class="box_general bg-white">
+                                <ul>
+                                    <li>
+                                        <form th:action="@{/place_order}" method="post" name="order_cod">
+                                            <input type="hidden" name="payment" value="COD">
+                                        </form>
+                                        <label class="container_radio">Cash on delivery
+                                            <input type="radio" name="payment" id="radio-COD">
+                                            <span class="checkmark"></span>
+                                        </label>
+                                    </li>
+                                    <li>
+                                        <label class="container_radio">Paypal or Credit card
+                                            <input type="radio" name="payment" id="radio_paypal_credit_cart">
+                                            <span class="checkmark"></span>
+                                        </label>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="payment_info d-none d-sm-block">
+                                <figure><img src="img/cards_all.svg" alt=""></figure>
+                                <p>By placing order, you agree to our companies term of service.</p>
+                            </div>
+                        </div>
+                        <!-- /step -->
+    
+                    </div>
+                    <div class="col-lg-4 col-md-6">
+                        <div class="step last">
+                            <h3>3. Order Summary</h3>
+                            <div class="box_general summary">
+                                <ul>
+                                    <th:block th:each="item : ${cartItems}">
+                                        <li class="clearfix" th:with="product = ${item.product}">
+                                            <em>[[${item.quantity}]]&times; <a th:href="@{'/products/' + ${product.tag}}">[[${product.shortName}]]</a></em><span>$[[${#numbers.formatDecimal(item.subtotal, 1, 'DEFAULT', 2, 'POINT')}]]</span>
+                                        </li>
+                                        <li class="clearfix">
+                                            <small>Shipping cost: $[[${#numbers.formatDecimal(item.shippingCost, 1, 'DEFAULT', 2, 'POINT')}]]</small>
+                                        </li>
+                                    </th:block>
+                                </ul>
+                                <ul>
+                                    <li class="clearfix"><em><strong>Subtotal</strong></em> <span>$[[${#numbers.formatDecimal(checkoutInfo.productTotal, 1, 'DEFAULT', 2, 'POINT')}]]</span></li>
+                                    <li class="clearfix"><em><strong>Shipping</strong></em> <span>$[[${#numbers.formatDecimal(checkoutInfo.shippingCostTotal, 1, 'DEFAULT', 2, 'POINT')}]]</span></li>
+                                </ul>
+                                <div class="total clearfix">TOTAL <span>$[[${#numbers.formatDecimal(checkoutInfo.paymentTotal, 1, 'DEFAULT', 2, 'POINT')}]]</span></div>
+                                <a class="btn_1 full-width d-none" id="cod-place-order" th:if="${checkoutInfo.codSupported}" href="javascript: document.order_cod.submit()">Confirm COD and Place Order</a>
+                                <em class="cod-not-supported d-none" th:unless="${checkoutInfo.codSupported}">Cash on delivery is not supported at your location.</em>
+                                <div class="d-none" id="paypal-button-container"></div>
+                                <form th:action="@{/process_paypal_order}" method="post" id="paypal_form">
+                                    <input type="hidden" name="orderId" id="orderId">
+                                    <input type="hidden" name="payment" value="PAYPAL">
+                                </form>
+                            </div>
+                        </div>
+                        <!-- /step -->
+                    </div>
+                </div>
+                <!-- /row -->
+            </div>
+            <!-- /container -->
+        </main>
+        <!--/main-->
+
+		<footer th:replace="fragments :: footer"></footer>		
+
+    </div>
+    <div id="toTop"></div><!-- Back to top button -->
+	
+	<!-- COMMON SCRIPTS -->
+    <script th:src="@{https://www.paypal.com/sdk/js?(client-id=${paypal_client_id},currency=USD)}"></script>
+    <script th:src="@{/js/common_scripts.min.js}"></script>
+    <script th:src="@{/js/main.js}"></script>
+    <script>
+        customerFirstName = "[[${customer.fullName}]]".split(' ').slice(0, -1).join(' ')
+        customerLastName = "[[${customer.fullName}]]".split(' ').slice(-1).join(' ')
+        customerEmail = "[[${customer.email}]]"
+        paymentTotal = "[[${checkoutInfo.paymentTotalForPayPal}]]"
+    </script>
+    <script th:src="@{/js/checkout.js}"></script>
+</body>
+</html>

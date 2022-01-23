@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html xmlns:th="http://thymeleaf.org">
+
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+
+	<!-- Bootstrap CSS -->
+	<link rel="stylesheet" type="text/css" th:href="@{/webjars/bootstrap/css/bootstrap.min.css}">
+	<link rel="stylesheet" type="text/css" th:href="@{/webjars/font-awesome/css/all.css}">
+
+	<!-- Custom CSS -->
+	<link rel="stylesheet" type="text/css" th:href="@{/css/category.css}">
+
+	<title>[[${pageTitle}]]</title>
+
+	<!-- JS -->
+	<script type="text/javascript" th:src="@{/webjars/jquery/jquery.min.js}"></script>
+	<script type="text/javascript" th:src="@{/webjars/bootstrap/js/bootstrap.min.js}"></script>
+	<script type="text/javascript" th:src="@{/js/script.js}"></script>
+	<script type="text/javascript" th:src="@{/js/modal.js}"></script>
+	<script type="text/javascript">
+		contextPath = "[[@{/}]]"
+	</script>
+	<script type="text/javascript" th:src="@{/js/append_list.js}"></script>
+</head>
+
+<body>
+
+	<div th:if="${success != null}" class="alert alert-success text-center">[[${success}]]</div>
+	
+	<form th:action="@{/shipping_rates/save}" th:object="${shippingRate}" method="POST">
+		<input type="hidden" th:field="*{id}"/>
+		<div class="adduser-container container">
+			<div class="adduser-top w-100">
+				<h2>[[${pageTitle}]]</h2>
+			</div>
+			
+			<div class="inputs d-flex">
+	            <div class="form-group">
+	                <label class="form-control-placeholder">Destination City:</label>
+	                <select class="form-control" th:field="*{city}">
+						<option th:each="city : ${listCities}" th:value="${city.id}">[[${city.name}]]</option>
+					</select>
+	            </div>
+	            <div class="form-group">
+	                <label class="form-control-placeholder">Destination District:</label>
+	                <!-- <input type="text" class="form-control" th:field="*{district}" minlength="3" maxlength="30" list="listDistrict" required>
+					<datalist id="listDistrict"></datalist> -->
+					<select id="listDistrict" class="form-control">
+						<option th:each="district : ${listDistricts}" th:value="${district.id}" th:selected="${district.name == shippingRate.district}">[[${district.name}]]</option>
+					</select>
+
+	            </div>
+	            <div class="form-group">
+	                <label class="form-control-placeholder">Shipping Rate<br>(per dimensional weight):</label>
+	                <input type="number" class="form-control" th:field="*{rate}" step="0.01" min="0" required>
+	            </div>
+	            <div class="form-group">
+	                <label class="form-control-placeholder">Day(s) to deliver:</label>
+	                <input type="number" class="form-control" th:field="*{days}" step="1" min="0" required>
+	            </div>
+	        </div>			
+
+			<div class="checkbox-container w-100 d-flex">
+				<label class="checkbox-label" for="c1">Cash On Deliver</label>
+				<input type="checkbox" th:field="*{codSupported}"/>
+			</div>
+			
+			<div class="buttons w-100 d-flex">
+	            <div class="button-div">
+	                <input class="save-button" type="submit" value="Save">
+	                <input class="cancel-button" type="button" value="Cancel" id="btnCancel">
+	            </div>
+	        </div>
+			
+		</div>
+	</form>
+	
+	<div class="modal fade text-center" id="modalDialog">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h4 class="modal-title" id="modalTitle">Warning</h4>
+					<button type="button" class="close" data-dismiss="modal">&times;</button>
+				</div>
+				<div class="modal-body">
+					<span id="modalBody"></span>
+				</div>
+			</div>
+		</div>
+	</div>
+	
+</body>
+
+</html>

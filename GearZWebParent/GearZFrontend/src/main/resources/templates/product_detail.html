@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html xmlns:th="http://thymeleaf.org">
+<head>
+    <th:block th:replace="fragments :: page_head(${pageTitle}, 'none')"></th:block>
+    <link th:href="@{/css/product_page.css}" rel="stylesheet">
+    <script>
+        productId = "[[${product.id}]]"
+        var csrfHeaderName = "[[${_csrf.headerName}]]"
+        var csrfToken = "[[${_csrf.token}]]"
+    </script>
+</head>
+<body>
+    <div id="page">
+        <header th:replace="fragments :: header"></header>
+
+		<main>
+            
+            <div class="container margin_30" style="position: relative;">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="all">
+                            <div class="slider">
+                                <div class="owl-carousel owl-theme main">
+                                    <div th:style="'background-image: url(' + @{${product.mainImagePath}} + ');'" class="item-box"></div>
+                                    <th:block th:each="extraImage : ${product.images}">
+                                        <div th:style="'background-image: url(' + @{${extraImage.imagePath}} + ');'" class="item-box"></div>
+                                    </th:block>
+                                </div>
+                                <div class="left nonl"><i class="ti-angle-left"></i></div>
+                                <div class="right"><i class="ti-angle-right"></i></div>
+                            </div>
+                            <div class="slider-two">
+                                <div class="owl-carousel owl-theme thumbs">
+                                    <div th:style="'background-image: url(' + @{${product.mainImagePath}} + ');'" class="item active"></div>
+                                    <th:block th:each="extraImage : ${product.images}">
+                                        <div th:style="'background-image: url(' + @{${extraImage.imagePath}} + ');'" class="item"></div>
+                                    </th:block>
+                                </div>
+                                <th:block th:if="${#lists.size(product.images) > 4}">
+                                    <div class="left-t nonl-t"></div>
+                                    <div class="right-t"></div>
+                                </th:block>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="breadcrumbs">
+                            <ul>
+                                <li><a th:href="@{/}">Home</a></li>
+                                <th:block th:each="parent : ${parentCategories}">
+                                    <li><a th:href="@{'/c/' + ${parent.tag}}">[[${parent.name}]]</a></li>
+                                </th:block>
+                                <li th:if="${product != null}">[[${product.name}]]</li>
+                            </ul>
+                        </div>
+                        <!-- /page_header -->
+                        <div class="prod_info">
+                            <h1>[[${product.name}]]</h1>
+                            <!-- <span class="rating"><i class="icon-star voted"></i><i class="icon-star voted"></i><i class="icon-star voted"></i><i class="icon-star voted"></i><i class="icon-star"></i><em>4 reviews</em></span> -->
+                            <p><small>Brand: [[${product.brand.name}]]</small></p>
+                            <div th:utext="${product.shortDescription}"></div>
+                            <div class="prod_options">
+                                <div class="row">
+                                    <label class="col-xl-5 col-lg-5 col-md-6 col-6 pt-0">
+                                        <strong th:unless="${product.inStock}" style="color: #f33;">Out of stock</strong>
+                                        <strong>&nbsp;</strong>
+                                    </label>
+                                    <div class="col-xl-4 col-lg-5 col-md-6 col-6">
+                                        <strong th:if="${product.inStock}" style="color: #5cad51;">Available</strong>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <th:block th:if="${product.inStock}">
+                                        <label class="col-xl-5 col-lg-5  col-md-6 col-6"><strong>Quantity</strong></label>
+                                        <div class="col-xl-4 col-lg-5 col-md-6 col-6">
+                                            <div class="numbers-row">
+                                                <input type="text" value="1" th:id="'quantity_' + ${product.id}" class="qty2" onkeydown="return false">
+                                                <div class="inc button_inc" th:pid="${product.id}">+</div>
+                                                <div class="dec button_inc" th:pid="${product.id}">-</div>
+                                            </div>
+                                        </div>
+                                    </th:block>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-lg-5 col-md-6">
+                                    <div th:if="${product.discountPercentage <= 0}" class="price_main">
+                                        <span class="new_price">$[[${#numbers.formatDecimal(product.price, 1, 'DEFAULT', 2, 'POINT')}]]</span>
+                                    </div>
+                                    <div th:if="${product.discountPercentage > 0}" class="price_main">
+                                        <span class="old_price">$[[${#numbers.formatDecimal(product.price, 1, 'DEFAULT', 2, 'POINT')}]]</span>
+                                        <span class="percentage">-[[${#numbers.formatDecimal(product.discountPercentage, 0, 'DEFAULT', 0, 'POINT')}]]%</span>
+                                        <span class="new_price">$[[${#numbers.formatDecimal(product.discountedPrice, 1, 'DEFAULT', 2, 'POINT')}]]</span>
+                                    </div>
+                                </div>
+                                <div class="col-lg-4 col-md-6">
+                                    <div class="btn_add_to_cart">
+                                        <!-- <a href="#0" class="btn_1">Add to Cart</a> -->
+                                        <th:block th:if="${product.inStock}">
+                                            <input type="button" value="ADD TO CART" class="btn_1" id="add-to-cart-btn">
+                                        </th:block>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                        </div>
+                        <!-- /prod_info -->
+                        <div class="product_actions">
+                            <ul>
+                                <li>
+                                    <a href="#"><i class="ti-heart"></i><span>Add to Wishlist</span></a>
+                                </li>
+                                <li>
+                                    <a href="#"><i class="ti-control-shuffle"></i><span>Add to Compare</span></a>
+                                </li>
+                            </ul>
+                        </div>
+                        <!-- /product_actions -->
+                    </div>
+                </div>
+                <!-- /row -->
+                <div class="toast" data-delay="10000" data-animation="true" role="alert" aria-live="assertive" aria-atomic="true" style="position: absolute; bottom: 0; right: 0; min-width: 500px;">
+                    <div class="toast-header">
+                        <svg class=" rounded mr-2" width="20" height="20" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice" focusable="false" role="img">
+                            <rect fill="#007aff" width="100%" height="100%" /></svg>
+                        <strong class="mr-auto">Notification</strong>
+                        <button type="button" class="ml-2 mb-1 close" data-dismiss="toast" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="toast-body">
+                        
+                    </div>
+                </div>
+                <!-- /toast -->
+            </div>
+            <!-- /container -->
+            
+            <div class="tabs_product">
+                <div class="container">
+                    <ul class="nav nav-tabs" role="tablist">
+                        <li class="nav-item">
+                            <a id="tab-A" href="#pane-A" class="nav-link active" data-toggle="tab" role="tab">Description</a>
+                        </li>
+                        <!-- <li class="nav-item">
+                            <a id="tab-B" href="#pane-B" class="nav-link" data-toggle="tab" role="tab">Reviews</a>
+                        </li> -->
+                    </ul>
+                </div>
+            </div>
+            <!-- /tabs_product -->
+            <div class="tab_content_wrapper">
+                <div class="container">
+                    <div class="tab-content" role="tablist">
+                        <div id="pane-A" class="card tab-pane fade active show" role="tabpanel" aria-labelledby="tab-A">
+                            <div class="card-header" role="tab" id="heading-A">
+                                <h5 class="mb-0">
+                                    <a class="collapsed" data-toggle="collapse" href="#collapse-A" aria-expanded="false" aria-controls="collapse-A">
+                                        Description
+                                    </a>
+                                </h5>
+                            </div>
+                            <div id="collapse-A" class="collapse" role="tabpanel" aria-labelledby="heading-A">
+                                <div class="card-body">
+                                    <div class="row justify-content-between">
+                                        <div class="col-lg-6">
+                                            <h3>Product Details</h3>
+                                            <div th:utext="${product.fullDescription}"></div>
+                                        </div>
+                                        <div class="col-lg-5">
+                                            <h3>Specifications</h3>
+                                            <div class="table-responsive">
+                                                <table class="table table-sm table-striped">
+                                                    <tbody>
+                                                        <tr th:each="spec : ${product.specs}">
+                                                            <td><strong>[[${spec.name}]]</strong></td>
+                                                            <td>[[${spec.value}]]</td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                            <!-- /table-responsive -->
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- /TAB A -->
+                        <div id="pane-B" class="card tab-pane fade" role="tabpanel" aria-labelledby="tab-B">
+                            <div class="card-header" role="tab" id="heading-B">
+                                <h5 class="mb-0">
+                                    <a class="collapsed" data-toggle="collapse" href="#collapse-B" aria-expanded="false" aria-controls="collapse-B">
+                                        Reviews
+                                    </a>
+                                </h5>
+                            </div>
+                            <div id="collapse-B" class="collapse" role="tabpanel" aria-labelledby="heading-B">
+                                
+                            </div>
+                        </div>
+                        <!-- /tab B -->
+                    </div>
+                    <!-- /tab-content -->
+                </div>
+                <!-- /container -->
+            </div>
+            <!-- /tab_content_wrapper -->
+    
+            
+    
+            <div class="feat">
+                <div class="container">
+                    <ul>
+                        <li>
+                            <div class="box">
+                                <i class="ti-wallet"></i>
+                                <div class="justify-content-center">
+                                    <h3>Secure Payment</h3>
+                                    <p>100% secure payment</p>
+                                </div>
+                            </div>
+                        </li>
+                        <li>
+                            <div class="box">
+                                <i class="ti-headphone-alt"></i>
+                                <div class="justify-content-center">
+                                    <h3>24/7 Support</h3>
+                                    <p>Online top support</p>
+                                </div>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <!--/feat-->
+            
+        </main>
+        <!-- /main -->
+        
+
+		<footer th:replace="fragments :: footer"></footer>		
+
+    </div>
+    <div id="toTop"></div><!-- Back to top button -->
+	
+	<!-- COMMON SCRIPTS -->
+    <script th:src="@{/js/common_scripts.min.js}"></script>
+    <script th:src="@{/js/main.js}"></script>
+
+    <!-- SPECIFIC SCRIPTS -->
+    <script th:src="@{/js/carousel_with_thumbs.js}"></script>
+    <script th:src="@{/js/cart.js}"></script>
+</body>
+</html>

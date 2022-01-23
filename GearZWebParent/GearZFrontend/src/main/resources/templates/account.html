@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html xmlns:th="http://thymeleaf.org">
+
+<head>
+	<th:block th:replace="fragments :: page_head(${pageTitle}, 'none')"></th:block>
+	<link th:href="@{/css/account.css}" rel="stylesheet">
+	<link th:href="@{/css/custom.css}" rel="stylesheet">
+
+</head>
+
+<body>
+	<div id="page">
+		<header th:replace="fragments :: header"></header>
+
+		<main class="bg_gray">
+
+			<div class="container margin_30">
+				<div class="page_header">
+					<div class="breadcrumbs">
+						<ul>
+							<li><a th:href="@{/}">Home</a></li>
+							<li>Account</li>
+						</ul>
+					</div>
+					<h1>[[${pageTitle}]]</h1>
+				</div>
+				<!-- /page_header -->
+				<div th:if="${success != null}" class="alert alert-success text-center">[[${success}]]</div>
+				<div th:if="${failed != null}" class="alert alert-danger text-center">[[${failed}]]</div>
+				<div th:if="${param.error}" class="alert alert-danger text-center">
+					<i class="fas fa-exclamation-triangle"></i> [[${session.SPRING_SECURITY_LAST_EXCEPTION.message}]]
+				</div>
+				<div th:if="${param.logout}" class="alert alert-warning text-center">
+					You have been logged out.
+				</div>
+
+				<div class="row justify-content-center">
+					<div class="col-xl-6 col-lg-6 col-md-8">
+						<div class="box_account">
+							<h3 class="client">Already Client</h3>
+							<div class="form_container">
+								<div class="row no-gutters">
+									<div class="col-lg-6 pr-lg-1">
+										<a th:href="@{/oauth2/authorization/facebook}" class="social_bt facebook">Login
+											with Facebook</a>
+									</div>
+									<div class="col-lg-6 pl-lg-1">
+										<a th:href="@{/oauth2/authorization/google}" class="social_bt google">Login with
+											Google</a>
+									</div>
+								</div>
+								<div class="divider"><span>Or</span></div>
+								<form th:action="@{/account}" method="post">
+									<div class="form-group">
+										<input type="email" class="form-control" name="customer_email"
+											id="customer_email" placeholder="Email*">
+									</div>
+									<div class="form-group">
+										<input type="password" class="form-control" name="password" id="password"
+											placeholder="Password*">
+									</div>
+									<div class="clearfix add_bottom_15">
+										<div class="checkboxes float-left">
+											<label class="container_check">Remember me
+												<input type="checkbox" name="remember-me">
+												<span class="checkmark"></span>
+											</label>
+										</div>
+										<div class="float-right"><a id="forgot" href="javascript:void(0);">Lost
+												Password?</a></div>
+									</div>
+									<div class="text-center"><input type="submit" value="Log In"
+											class="btn_1 full-width">
+
+								</form>
+
+							</div>
+							<div id="forgot_pw">
+								<form th:action="@{/forgot_password}" method="post">
+									<div class="form-group">
+										<input type="email" class="form-control" name="email_forgot"
+											placeholder="Type your email">
+									</div>
+									<p>A new password will be sent shortly.</p>
+									<div class="text-center"><input type="submit" value="Reset Password" class="btn_1">
+									</div>
+								</form>
+							</div>
+						</div>
+						<!-- /form_container -->
+					</div>
+					<!-- /box_account -->
+				</div>
+				<div class="col-xl-6 col-lg-6 col-md-8">
+					<div class="box_account">
+						<h3 class="new_client">New Client</h3> <small class="float-right pt-2">* Required
+							Fields</small>
+						<form th:action="@{/create_account}" th:object="${customer}" method="post"
+							onsubmit="return checkExistedEmail(this)">
+							<div class="form_container">
+								<div class="form-group">
+									<input type="email" class="form-control" placeholder="Email*" th:field="*{email}"
+										minlength="8" maxlength="128" required>
+								</div>
+								<div class="form-group">
+									<input type="password" class="form-control" placeholder="Password*"
+										th:field="*{fullPassword}" minlength="6" maxlength="64" required
+										oninput="check_password_match(document.getElementById('confirm_password'))">
+								</div>
+								<div class="form-group">
+									<input type="password" class="form-control" id="confirm_password"
+										placeholder="Re-type Password*" minlength="6" maxlength="64" required
+										oninput="check_password_match(this)">
+								</div>
+								<hr>
+								<div class="private box">
+									<div class="row no-gutters">
+										<div class="col-12">
+											<div class="form-group">
+												<input type="text" class="form-control" placeholder="Full Name*"
+													th:field="*{fullName}" minlength="9" maxlength="40" required>
+											</div>
+										</div>
+										<div class="col-12">
+											<div class="form-group">
+												<input type="text" class="form-control" placeholder="Telephone*"
+													th:field="*{phoneNumber}" maxlength="11" required>
+											</div>
+										</div>
+										<div class="col-12">
+											<div class="form-group">
+												<input type="text" class="form-control" placeholder="Full Address*"
+													th:field="*{addressLine}" required>
+											</div>
+										</div>
+									</div>
+									<!-- /row -->
+									<div class="row no-gutters">
+										<div class="col-12">
+											<div class="form-group">
+												<div class="custom-select-form">
+													<select class="wide add_bottom_10" th:field="*{city}">
+														<option value="" selected>City*</option>
+													</select>
+												</div>
+											</div>
+										</div>
+
+									</div>
+									<!-- /row -->
+
+									<div class="row no-gutters">
+										<div class="col-6 pr-1">
+											<div class="form-group">
+												<div class="custom-select-form">
+													<select class="wide add_bottom_10" th:field="*{district}">
+														<option value="" selected>District*</option>
+
+													</select>
+												</div>
+											</div>
+										</div>
+										<div class="col-6 pl-1">
+											<div class="form-group">
+												<div class="custom-select-form">
+													<select class="wide add_bottom_10" th:field="*{ward}">
+														<option value="" selected>Ward*</option>
+
+													</select>
+												</div>
+											</div>
+										</div>
+									</div>
+									<!-- /row -->
+
+								</div>
+								<!-- /private -->
+
+								<hr>
+								<div class="text-center"><input type="submit" value="Register" id="register-btn"
+										class="btn_1 full-width">
+								</div>
+							</div>
+							<!-- /form_container -->
+						</form>
+					</div>
+					<!-- /box_account -->
+				</div>
+			</div>
+			<!-- /row -->
+			</div>
+		<!-- /container -->
+		</main>
+		<!--/main-->
+
+		<footer th:replace="fragments :: footer"></footer>
+
+	</div>
+	<div id="toTop"></div><!-- Back to top button -->
+
+	<!-- COMMON SCRIPTS -->
+	<script th:src="@{/js/common_scripts.min.js}"></script>
+	<script th:src="@{/js/main.js}"></script>
+	<script th:src="@{/js/append_lists.js}"></script>
+	<script th:src="@{/js/password_match.js}"></script>
+	<script>
+		function checkExistedEmail(form) {
+			_url = context_path + "customer/check_email_existed"
+			userEmail = $("#email").val();
+			csrfValue = $("input[name='_csrf']").val();
+			params = {
+				email: userEmail,
+				_csrf: csrfValue
+			};
+
+			$.post(_url, params, function (response) {
+				console.log(response)
+				if (response == "OK") {
+					form.submit();
+				} else if (response == "Existed") {
+					document.getElementById("email").setCustomValidity("Email " + userEmail + " is already existed");
+					document.getElementById("register-btn").click();
+				} else {
+					document.getElementById("email").setCustomValidity("No response from server");
+				}
+			}).fail(function () {
+				document.getElementById("email").setCustomValidity("Could not connect to server");
+			});
+			return false;
+		}
+	</script>
+</body>
+
+</html>

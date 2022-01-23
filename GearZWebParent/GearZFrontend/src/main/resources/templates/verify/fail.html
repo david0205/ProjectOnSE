@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html xmlns:th="http://thymeleaf.org">
+
+<head>
+	<th:block th:replace="fragments :: page_head('Verification Failed!', 'none')"></th:block>
+
+	<meta http-equiv="refresh" th:content="|5;url=@{/}|" />
+
+	<!-- SPECIFIC CSS -->
+	<link th:href="@{/css/checkout.css}" rel="stylesheet">
+
+	<!-- YOUR CUSTOM CSS -->
+	<link th:href="@{/css/custom.css}" rel="stylesheet">
+
+</head>
+
+<body>
+
+	<div id="page">
+
+		<header th:replace="fragments :: header"></header>
+		<!-- /header -->
+
+		<main class="bg_gray">
+			<div class="container">
+				<div class="row justify-content-center">
+					<div class="col-md-5">
+						<div id="confirm">
+							<div class="verify-fail icon-box">
+								<i class="material-icons">&#xE5CD;</i>
+							</div>
+							<div>&nbsp;</div>
+							<h2>Fail!</h2>
+							<p>Your account has already been verified or the verification is invalid!</p>
+							<p>Redirecting you to homepage...</p>
+						</div>
+					</div>
+				</div>
+				<!-- /row -->
+			</div>
+			<!-- /container -->
+
+		</main>
+		<!--/main-->
+
+		<footer th:replace="fragments :: footer"></footer>
+		<!--/footer-->
+	</div>
+	<!-- page -->
+
+	<div id="toTop"></div><!-- Back to top button -->
+
+	<!-- COMMON SCRIPTS -->
+	<script th:src="@{/js/common_scripts.min.js}"></script>
+	<script th:src="@{/js/main.js}"></script>
+
+</body>
+
+</html>

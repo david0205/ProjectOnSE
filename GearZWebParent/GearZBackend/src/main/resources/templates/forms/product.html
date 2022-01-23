@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html xmlns:th="http://thymeleaf.org" xmlns:sec="http://thymeleaf.org/thymeleaf-extras-springsecurity5">
+
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+
+	<!-- Bootstrap CSS -->
+	<link rel="stylesheet" type="text/css" th:href="@{/webjars/bootstrap/css/bootstrap.min.css}">
+	<link rel="stylesheet" type="text/css" th:href="@{/webjars/font-awesome/css/all.css}">
+
+	<!-- Custom CSS -->
+	<link rel="stylesheet" type="text/css" th:href="@{/css/product.css}">
+
+	<!-- Rich text -->
+	<link rel="stylesheet" type="text/css" th:href="@{/richtext/richtext.min.css}">
+	
+	<title>[[${pageTitle}]]</title>
+	
+	<!-- Global JS -->
+	<script type="text/javascript">
+		brandURL = "[[@{/brands}]]";
+		_url = "[[@{/products/check_product}]]"
+		default_img = "[[@{/img/no-image-icon.png}]]"
+	</script>
+
+	<!-- JS -->
+	<script type="text/javascript" th:src="@{/webjars/jquery/jquery.min.js}"></script>
+	<script type="text/javascript" th:src="@{/webjars/bootstrap/js/bootstrap.min.js}"></script>
+	<script type="text/javascript" th:src="@{/richtext/jquery.richtext.min.js}"></script>
+	<script type="text/javascript" th:src="@{/js/script.js}"></script>
+	<script type="text/javascript" th:src="@{/js/modal.js}"></script>
+	<script type="text/javascript" th:src="@{/js/product/product.js}"></script>
+	<script type="text/javascript" th:src="@{/js/product/extra_image.js}"></script>
+	<script type="text/javascript" th:src="@{/js/product/specifications.js}"></script>
+
+</head>
+
+<body>
+
+	<div th:if="${success != null}" class="alert alert-success text-center">[[${success}]]</div>
+
+	<form th:action="@{/products/save}" th:object="${product}" enctype="multipart/form-data" onsubmit="return checkExisted(this);" method="POST">
+		<input type="hidden" th:field="*{id}" />
+		<input th:if="${product.category != null}" type="hidden" id="categoryId" th:value="${product.category.id}" />
+
+		<div class="container card shadow d-flex justify-content-center mt-5">
+			<div class="title w-100 text-center"
+				style="background-color: rgb(96, 96, 150); padding: 20px 0;color: #fff;">
+				<h2>[[${pageTitle}]]</h2>
+			</div>
+			<div class="container-content">
+				<!-- nav options -->
+				<ul class="nav nav-pills mb-3 shadow-sm" id="pills-tab" role="tablist">
+					<li class="nav-item">
+						<a class="nav-link active" data-toggle="pill" href="#pills-overview" role="tab">Overview</a>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link" data-toggle="pill" href="#pills-images" role="tab">Images</a>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link" data-toggle="pill" href="#pills-description" role="tab">Description</a>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link" data-toggle="pill" href="#pills-specifications" role="tab">Details</a>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link" data-toggle="pill" href="#pills-shipping" role="tab">Shipping</a>
+					</li>
+				</ul>
+				<!-- content -->
+				<div class="tab-content" id="pills-tabContent p-3">
+					<!-- 1st card: Overview -->
+					<div class="tab-pane fade show active" id="pills-overview" role="tabpanel">
+						<ul class="ccontent">
+							<li>
+								<div class="form-group d-flex ">
+									<label class="form-control-placeholder" for="name">Product Name:</label>
+									<input type="text" id="name" class="form-control" th:field="*{name}"
+											th:readonly="${#authorization.expression('hasAuthority(''Salesperson'')')}" 
+											placeholder="Enter product name" required minlength="3" maxlength="256">
+								</div>
+							</li>
+							<li>
+								<div class="form-group d-flex ">
+									<label class="form-control-placeholder " for="tag">Tag:</label>
+									<input type="text" id="tag" class="form-control" th:field="*{tag}"
+											th:readonly="${#authorization.expression('hasAuthority(''Salesperson'')')}"
+											placeholder="Enter tag (default is product name, spaces are replaced with -)" minlength="3" maxlength="64">
+								</div>
+							</li>
+							<li>
+								<div class="form-group d-flex ">
+									<label class="form-control-placeholder ">Brand:</label>
+									<th:block sec:authorize="hasAnyAuthority('Admin', 'Editor')">
+									<select class="custom-select form-control" th:field="*{brand}" required>
+										<th:block th:each="brand : ${listBrands}">
+											<option th:value="${brand.id}">[[${brand.name}]]</option>
+										</th:block>
+									</select>
+									</th:block>
+									<th:block sec:authorize="hasAuthority('Salesperson')">
+										<input type="text" class="form-control" th:value="${product.brand.name}" readonly/>
+									</th:block>
+								</div>
+	
+							</li>
+							<li>
+								<div class="form-group d-flex ">
+									<label class="form-control-placeholder " for="name">Category:</label>
+									<th:block sec:authorize="hasAnyAuthority('Admin', 'Editor')">
+										<th:block th:if="${product.category != null}">
+											<select class="custom-select form-control" th:field="*{category}">
+												<th:block th:each="c : ${product.brand.categories}">
+													<option th:value="${c.id}">[[${c.name}]]</option>
+												</th:block>
+											</select> 
+										</th:block>
+
+										<th:block th:if="${product.category == null}">
+											<select class="custom-select form-control" th:field="*{category}">
+											</select> 
+										</th:block>
+									</th:block>
+
+									<th:block sec:authorize="hasAuthority('Salesperson')">
+										<input type="text" class="form-control" th:value="${product.category.name}" readonly/>
+									</th:block>
+								</div>
+							</li>
+							<li>
+								<div class="form-group d-flex ">
+									<label class="form-control-placeholder " for="enabled">Enabled:</label>
+									<input type="checkbox" th:field="*{enabled}" class="form-control1" th:disabled="${#authorization.expression('hasAuthority(''Salesperson'')')}"/>
+								</div>
+							</li>
+							<li>
+								<div class="form-group d-flex ">
+									<label class="form-control-placeholder " for="inStock">In stock:</label>
+									<input type="checkbox" th:field="*{inStock}" class="form-control1" th:disabled="${#authorization.expression('hasAuthority(''Salesperson'')')}"/>
+								</div>
+							</li>
+							<li>
+								<div class="form-group d-flex ">
+									<label class="form-control-placeholder " for="price">Price:</label>
+									<input type="number" th:field="*{price}" step="any" class="form-control" required>
+								</div>
+							</li>
+							<li>
+								<div class="form-group d-flex ">
+									<label class="form-control-placeholder " for="discountPercentage">Discount:</label>
+									<input type="number" th:field="*{discountPercentage}" class="form-control" required>
+								</div>
+							</li>
+	
+						</ul>
+					</div>
+					<!-- 2nd card: Images -->
+					<div class="tab-pane fade" id="pills-images" role="tabpanel">
+						<th:block sec:authorize="hasAnyAuthority('Admin', 'Editor')">
+							<div class="tab-container d-flex justify-content-between">
+								<div id="main_container">
+									<div class="floated_box">
+										<div class="img-formgroup form-group border text-center rounded mr-2 d-block">
+											<div class="mb-2">
+												<label for="imageFile">Main Image&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>
+											</div>
+											<img id="productImg" th:src="@{${product.mainImagePath}}" alt="">
+											<p for="productImg">[[${product.mainImage}]]</p>
+											<input type="file" class="form-control-file mt-4" name="imageFile" id="imageFile" accept="image/*" th:required="${product.id == null}">
+										</div>
+										<input type="hidden" th:field="*{mainImage}">
+									</div>
+	
+									<th:block th:each="productImage, status : ${product.images}">
+										<div class="floated_box" th:id="'divExtraImage' + ${status.index}">
+											<div class="img-formgroup form-group border text-center rounded mr-2 d-block">
+												<div class="mb-2">
+													<label for="imageFile">Extra Image #[[${status.index + 1}]]
+														<a name="removeExtraImageButton" role="button" style="color: #fff; text-decoration: none;"><i class="fas fa-times-circle"></i></a>
+													</label>
+												</div>
+												<img th:id="'extraProductImg' + ${status.index}" th:src="@{${productImage.imagePath}}" alt="">
+												<p for="productImg">[[${productImage.image}]]</p>
+												<input type="file" class="form-control-file mt-4" name="extraImage" accept="image/*">
+											</div>
+											<input type="hidden" name="imageIDs" th:id="'imageId' + ${status.index}" th:value="${productImage.id}">
+											<input type="hidden" name="imageNames" th:id="'imageName' + ${status.index}" th:value="${productImage.image}">
+										</div>
+									</th:block>
+	
+									<div class="floated_box" th:id="'divExtraImage' + ${existingExtraImagesCount}">
+										<div class="img-formgroup form-group border text-center rounded mr-2 d-block">
+											<div class="mb-2">
+											<label for="imageFile" th:id="'extraImageHeader' + ${existingExtraImagesCount}">Extra Image #[[${existingExtraImagesCount + 1}]]</label>
+											</div>
+											<img th:id="'extraProductImg' + ${existingExtraImagesCount}" th:src="@{/img/no-image-icon.png}" alt="">
+											<input type="file" class="form-control-file mt-4" name="extraImage" accept="image/*">
+										</div>
+									</div>
+								</div>
+							</div>
+						</th:block>
+						<th:block sec:authorize="hasAuthority('Salesperson')">
+							<div class="tab-container d-flex justify-content-between">
+								<div id="main_container">
+									<div class="floated_box">
+										<div class="img-formgroup form-group border text-center rounded mr-2 d-block">
+											<div class="mb-2">
+												<label>Main Image&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>
+											</div>
+											<img th:src="@{${product.mainImagePath}}" alt="">
+											<p>[[${product.mainImage}]]</p>
+										</div>
+									</div>
+		
+									<th:block th:each="productImage, status : ${product.images}">
+										<div class="floated_box">
+											<div class="img-formgroup form-group border text-center rounded mr-2 d-block">
+												<div class="mb-2">
+													<label for="imageFile">Extra Image #[[${status.index + 1}]]</label>
+												</div>
+												<img th:src="@{${productImage.imagePath}}" alt="">
+												<p>[[${productImage.image}]]</p>
+											</div>
+										</div>
+									</th:block>
+								</div>
+							</div>
+						</th:block>
+					</div>
+					<!-- 3nd card: Description -->
+					<div class="tab-pane fade" id="pills-description" role="tabpanel">
+						<th:block sec:authorize="hasAnyAuthority('Admin', 'Editor')">
+							<div class="form-group addinfo">
+								<label for="shortDescription">Short description:</label>
+								<textarea th:field="*{shortDescription}" required></textarea>
+							</div>
+							<div class="form-group">
+								<label for="fullDescription">Full description:</label>
+								<textarea th:field="*{fullDescription}" required></textarea>
+							</div>
+						</th:block>
+
+						<th:block sec:authorize="hasAuthority('Salesperson')">
+							<div class="form-group">
+								<label for="shortDescription">Short description:</label><br>
+								<div class="border border-primary rounded p-2 m-2" th:utext="${product.shortDescription}"></div>
+							</div>
+							<div class="form-group">
+								<label for="fullDescription">Full description:</label><br>
+								<div class="border border-primary rounded p-2 m-2" th:utext="${product.fullDescription}"></div>
+							</div>
+						</th:block>
+					</div>
+					<!-- 4th card: Specifications -->
+					<div class="tab-pane fade" id="pills-specifications" role="tabpanel">
+						<th:block sec:authorize="hasAnyAuthority('Admin', 'Editor')">
+							<div class="container-detail" id="divProductSpecification">
+								<th:block th:each="detail, status : ${product.specs}">
+									<div class="container-detail1 d-flex align-items-center mt-2" th:id="'specsSection' + ${status.index}">
+										<input type="hidden" name="specIDs" th:value="${detail.id}"/>
+										<div class="form-group d-flex align-items-center">
+											<label class="form-control-placeholder " for="specName">Name:</label>
+											<input type="text" name="specName" id="specName" class="form-control" required th:value="${detail.name}">
+										</div>
+										<div class="form-group d-flex ml-5">
+											<label class="form-control-placeholder " for="specValue">Value:</label>
+											<input type="text" name="specValue" id="specValue" class="form-control" required th:value="${detail.value}">
+										</div>
+										<div class="remove-row ml-2">
+											<a name="removeSpecDetailButton" class="far fa-times-circle" role="button" style="text-decoration: none;"></a>
+										</div>
+									</div>
+								</th:block>
+	
+								<div class="container-detail1 d-flex align-items-center mt-2" th:id="'specsSection' + ${#lists.size(product.specs)}">
+									<input type="hidden" name="specIDs" value="0"/>
+									<div class="form-group d-flex align-items-center">
+										<label class="form-control-placeholder " for="specName">Name:</label>
+										<input type="text" name="specName" id="specName" class="form-control" th:required="${product.id == null}">
+									</div>
+									<div class="form-group d-flex ml-5">
+										<label class="form-control-placeholder " for="specValue">Value:</label>
+										<input type="text" name="specValue" id="specValue" class="form-control" th:required="${product.id == null}">
+									</div>
+								</div>
+							</div>
+							<div class="mt-2">
+								<a id="btnAddMoreDetail" class="btn btn-info" role="button" onclick="addNextSpecificationSection()"><i class="fas fa-plus-circle"></i> Add more details</a>
+								<input type="hidden" name="extraSpecDetailCount" value="0">
+							</div>
+						</th:block>
+
+						<th:block sec:authorize="hasAuthority('Salesperson')">
+							<div>
+								<table class="table table-striped table-bordered table-hover">
+									<thead class="thead-dark">
+										<tr>
+											<th>Name</th>
+											<th>Value</th>
+										</tr>
+									</thead>
+									<tbody>
+										<tr th:each="spec : ${product.specs}">
+											<td>[[${spec.name}]]</td>
+											<td>[[${spec.value}]]</td>
+										</tr>
+									</tbody>
+								</table>
+							</div>
+						</th:block>
+					</div>
+					<!-- 5th card: Shipping -->
+					<div class="tab-pane fade" id="pills-shipping" role="tabpanel">
+						<th:block sec:authorize="hasAnyAuthority('Admin', 'Editor')">
+							Calculate shipping cost for the product.<br/>
+							The cost is calculated based on the package.<br/>
+							Unit: inch(""), pound(lbs)
+							<div class="form-group d-flex ">
+								<label class="form-control-placeholder " for="length">Length:</label>
+								<input type="number" th:field="*{length}" step="any" class="form-control" required>
+							</div>
+							<div class="form-group d-flex ">
+								<label class="form-control-placeholder " for="width">Width:</label>
+								<input type="number" th:field="*{width}" step="any" class="form-control" required>
+							</div>
+							<div class="form-group d-flex ">
+								<label class="form-control-placeholder " for="height">Height:</label>
+								<input type="number" th:field="*{height}" step="any" class="form-control" required>
+							</div>
+							<div class="form-group d-flex ">
+								<label class="form-control-placeholder " for="weight">Weight:</label>
+								<input type="number" th:field="*{weight}" step="any" class="form-control" required>
+							</div>
+						</th:block>
+						<th:block sec:authorize="hasAuthority('Salesperson')">
+							<div class="form-group d-flex ">
+								<label class="form-control-placeholder " for="length">Length:</label>
+								<input type="text" th:value="${product.length}" class="form-control" readonly>
+							</div>
+							<div class="form-group d-flex ">
+								<label class="form-control-placeholder " for="width">Width:</label>
+								<input type="text" th:value="${product.width}" class="form-control" readonly>
+							</div>
+							<div class="form-group d-flex ">
+								<label class="form-control-placeholder " for="height">Height:</label>
+								<input type="text" th:value="${product.height}" class="form-control" readonly>
+							</div>
+							<div class="form-group d-flex ">
+								<label class="form-control-placeholder " for="weight">Weight:</label>
+								<input type="text" th:value="${product.weight}" class="form-control" readonly>
+							</div>
+						</th:block>
+					</div>
+	
+			</div>
+		</div>
+		
+
+		<div class="buttons w-100 d-flex">
+			<div class=" button-div ">
+				<input class="save-button" type="submit" value="Save">
+	            <input class="cancel-button" type="button" value="Cancel" id="btnCancel">
+			</div>
+		</div>
+
+	</form>
+
+	<div class="modal fade text-center" id="modalDialog">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h4 class="modal-title" id="modalTitle">Warning</h4>
+					<button type="button" class="close" data-dismiss="modal">&times;</button>
+				</div>
+				<div class="modal-body">
+					<span id="modalBody"></span>
+				</div>
+			</div>
+		</div>
+	</div>
+
+</body>
+
+</html>

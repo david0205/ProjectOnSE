@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html xmlns:th="http://thymeleaf.org">
+<head>
+	<th:block th:replace="fragments :: page_head('Home', 'none')"></th:block>
+	<!-- SPECIFIC CSS -->
+	<link th:href="@{css/home_1.css}" rel="stylesheet">
+	<script>
+		var csrfHeaderName = "[[${_csrf.headerName}]]"
+        var csrfToken = "[[${_csrf.token}]]"
+	</script>
+</head>
+<body>
+    <div id="page">
+        <header th:replace="fragments :: header"></header>
+
+		<div th:replace="main_homepage :: main"></div>
+
+		<footer th:replace="fragments :: footer"></footer>		
+
+    </div>
+	<div id="toTop"></div><!-- Back to top button -->
+
+    <!-- COMMON SCRIPTS -->
+    <script th:src="@{/js/common_scripts.min.js}"></script>
+    <script th:src="@{/js/main.js}"></script>
+	
+	<!-- SPECIFIC SCRIPTS -->
+	<script th:src="@{/js/modernizr.js}"></script>
+	<script th:src="@{/js/video_header.min.js}"></script>
+	<script>
+		// Video Header
+		HeaderVideo.init({
+			container: $('.header-video'),
+			header: $('.header-video--media'),
+			videoTrigger: $("#video-trigger"),
+			autoPlayVideo: true
+		});
+	</script>
+	<script th:src="@{/js/isotope.min.js}"></script>
+	<script>
+		// Isotope filter
+		$(window).on('load',function(){
+		  var $container = $('.isotope-wrapper');
+		  $container.isotope({ itemSelector: '.isotope-item', layoutMode: 'masonry' });
+		});
+		$('.isotope_filter').on( 'click', 'a', 'change', function(){
+		  var selector = $(this).attr('data-filter');
+		  $('.isotope-wrapper').isotope({ filter: selector });
+		});
+	</script>
+	<script th:src="@{/js/cart.js}"></script>
+
+</body>
+</html>

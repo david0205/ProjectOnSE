@@ -1,0 +1,31 @@
+{
+    "configurations": [
+        {
+            "type": "java",
+            "name": "Launch GearZFrontendApplication",
+            "request": "launch",
+            "mainClass": "com.gearz.GearZFrontendApplication",
+            "projectName": "GearZFrontend"
+        },
+        {
+            "type": "java",
+            "name": "Spring Boot-GearZBackendApplication<GearZBackend>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "console": "internalConsole",
+            "mainClass": "com.gearz.admin.GearZBackendApplication",
+            "projectName": "GearZBackend",
+            "args": ""
+        },
+        {
+            "type": "java",
+            "name": "Spring Boot-GearZFrontendApplication<GearZFrontend>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "console": "internalConsole",
+            "mainClass": "com.gearz.site.GearZFrontendApplication",
+            "projectName": "GearZFrontend",
+            "args": ""
+        }
+    ]
+}

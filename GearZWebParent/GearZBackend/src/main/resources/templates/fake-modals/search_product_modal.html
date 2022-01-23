@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html xmlns:th="http://thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Bootstrap CSS -->
+	<link rel="stylesheet" type="text/css" th:href="@{/webjars/bootstrap/css/bootstrap.min.css}">
+	<link rel="stylesheet" type="text/css" th:href="@{/webjars/font-awesome/css/all.css}">
+    <link rel="stylesheet" type="text/css" th:href="@{/webjars/datatables/css/jquery.dataTables.min.css}">
+    
+	<!-- Custom CSS -->
+	<link rel="stylesheet" type="text/css" th:href="@{/css/product.css}">
+    
+    <title>Search product</title>
+
+    <script type="text/javascript" th:src="@{/webjars/jquery/jquery.min.js}"></script>
+    <script type="text/javascript" th:src="@{/webjars/datatables/js/jquery.dataTables.min.js}"></script>
+	<script type="text/javascript" th:src="@{/webjars/bootstrap/js/bootstrap.min.js}"></script>
+	<script type="text/javascript" th:src="@{/js/modal.js}"></script>
+</head>
+<body>
+    <div class="container-fluid">
+        <div>
+            <table class="display table table-bordered table-striped table-hover" id="table-product">
+                <thead class="thead-dark">
+                    <th>Main Image</th>
+                    <th>Product Name</th>
+                </thead>
+                <tbody>
+                    <tr th:each="product : ${listProducts}">
+                        <td>
+                            <a href="" class="link-product" th:pid="${product.id}">
+                                <img th:src="@{${product.mainImagePath}}" width="100" height="100"/>
+                            </a>
+                        </td>
+                        <td>
+                            <a href="" class="link-product" th:pid="${product.id}">
+                                <b th:id="'pname' + ${product.id}">[[${product.name}]]</b>
+                            </a>
+                        </td>
+                    </tr>
+                </tbody>
+                <tfoot class="thead-dark">
+                    <th>Main Image</th>
+                    <th>Product Name</th>
+                </tfoot>
+            </table>
+        </div>
+    </div>
+
+    <div class="modal fade text-center" id="modalDialog">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h4 class="modal-title" id="modalTitle"></h4>
+					<button type="button" class="close" data-dismiss="modal">&times;</button>
+				</div>
+				<div class="modal-body">
+					<span id="modalBody"></span>
+				</div>
+			</div>
+		</div>
+	</div>
+
+    <script>
+        $(document).ready(function () {
+            $('#table-product').dataTable({
+                "pagingType": "full_numbers",
+                "lengthMenu": [10],
+                "bLengthChange": false,
+                "autoWidth": false,
+                "columnDefs": [
+                    { "searchable": false, "targets": [0] }
+                ]
+            });
+
+            $(".link-product").on("click", function (e) {
+                e.preventDefault()
+                productId = $(this).attr("pid")
+                productName = $("#pname" + productId).text()
+                if (window.parent.is_already_added(productId)) {
+                    showWarning("The product '" + productName + "' was already added.")
+                } else {
+                    window.parent.add_product(productId, productName);
+                }
+            })
+        })
+    </script>
+    
+</body>
+</html>

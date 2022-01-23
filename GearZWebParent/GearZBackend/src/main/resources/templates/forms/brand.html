@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html xmlns:th="http://thymeleaf.org">
+
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+
+	<!-- Bootstrap CSS -->
+	<link rel="stylesheet" type="text/css" th:href="@{/webjars/bootstrap/css/bootstrap.min.css}">
+	<link rel="stylesheet" type="text/css" th:href="@{/webjars/font-awesome/css/all.css}">
+
+	<!-- Custom CSS -->
+	<link rel="stylesheet" type="text/css" th:href="@{/css/category.css}">
+	<link rel="stylesheet" type="text/css" th:href="@{/css/brand.css}">
+
+	<title>[[${pageTitle}]]</title>
+
+	<!-- JS -->
+	<script type="text/javascript" th:src="@{/webjars/jquery/jquery.min.js}"></script>
+	<script type="text/javascript" th:src="@{/webjars/bootstrap/js/bootstrap.min.js}"></script>
+	<script type="text/javascript" th:src="@{/js/script.js}"></script>
+	<script type="text/javascript" th:src="@{/js/modal.js}"></script>
+	<script type="text/javascript">
+		$(document).ready(function() {
+			dropdownListCategories = $("#categories");
+			chosenCategories = $("#chosen-cate");
+			dropdownListCategories.change(function() {
+				chosenCategories.empty();
+				displayChosenCategories();
+			});
+			displayChosenCategories();
+		})
+		
+		function displayChosenCategories() {
+			dropdownListCategories.children("option:selected").each(function() {
+				selectedCategory = $(this);
+				categoryId = selectedCategory.val();
+				categoryName = selectedCategory.text().replace(/>/g, "");
+				chosenCategories.append("<a class='chosen-cate'>" + categoryName + "</a>");
+			});
+		}
+		function checkExisted(form) {
+			_url = "[[@{/brands/check_brand}]]"
+			brandId = $("#id").val();
+			brandName = $("#name").val();
+			csrfValue = $("input[name='_csrf']").val();
+			params = {id: brandId, name: brandName, _csrf: csrfValue};
+			
+			$.post(_url, params, function(response) {
+				if (response == "OK") {
+					form.submit();
+				} else if (response == "Exist") {
+					showWarning("'" + brandName + "'" + " Brand is already existed.");
+				}
+			}).fail(function() {
+				showError("Could not connect to server");
+			});
+			
+			return false;
+		}
+	</script>
+	
+</head>
+
+<body>
+
+	<div th:if="${success != null}" class="alert alert-success text-center">[[${success}]]</div>
+	
+	<form th:action="@{/brands/save}" th:object="${brand}" enctype="multipart/form-data" onsubmit="return checkExisted(this)" method="POST">
+		<input type="hidden" th:field="*{id}"/>
+		<div class="brand-container container">
+			<div class="adduser-top w-100">
+				<h2>[[${pageTitle}]]</h2>
+			</div>
+			
+			<div class="inputs d-flex">
+	            <div class="form-group mb-4">
+	                <label class="form-control-placeholder align-items-center" for="name">Brand Name:</label>
+	                <input type="text" class="form-control" th:field="*{name}" required>
+	            </div>
+	            <div class="form-group">
+	                <label class="form-control-placeholder align-items-center" for="logo">Logo:</label>
+	                <div class="form-control1 d-flex align-items-center">
+	                    <input type="file" class="btn-chfile" name="imageFile" id="imageFile" accept="image/*" th:required="${brand.id == null}"/>
+	                </div>
+	                <input type="hidden" th:field="*{logo}">
+	            </div>
+	            
+	        </div>	
+	        <div class="user-pic d-flex">
+	            <div class="picture">
+	                <img id="brandImg" th:src="@{${brand.logoPath}}" alt="">
+	            </div>
+	
+	        </div>
+	        
+	        <div class="inputs2 d-flex">
+	            <div class="form-group ">
+	                <label class="form-control-placeholder">Select one or more categories:</label>
+	                <select class="form-select mb-4" th:field="*{categories}" multiple aria-label="multiple select example">
+	                    <th:block th:each="c : ${listCategories}">
+	                    <option th:value="${c.id}">[[${c.name}]]</option>
+	                    </th:block>
+	                 </select>
+	            </div>
+	            <div class="form-group ">
+	                <label class="form-control-placeholder align-items-top">Chosen categories:</label>
+	                <div id="chosen-cate" class="form-control3" style="height: auto;">
+	                    
+	                </div>
+	            </div>
+	        </div>
+
+			<div class="buttons w-100 d-flex">
+	            <div class="button-div">
+	                <input class="save-button" type="submit" value="Save">
+	                <input class="cancel-button" type="button" value="Cancel" id="btnCancel">
+	            </div>
+	        </div>
+			
+		</div>
+	</form>
+	
+	<div class="modal fade text-center" id="modalDialog">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h4 class="modal-title" id="modalTitle">Warning</h4>
+					<button type="button" class="close" data-dismiss="modal">&times;</button>
+				</div>
+				<div class="modal-body">
+					<span id="modalBody"></span>
+				</div>
+			</div>
+		</div>
+	</div>
+	
+</body>
+
+</html>

@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html xmlns:th="http://thymeleaf.org">
+
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+
+	<!-- Bootstrap CSS -->
+	<link rel="stylesheet" type="text/css" th:href="@{/webjars/bootstrap/css/bootstrap.min.css}">
+	<link rel="stylesheet" type="text/css" th:href="@{/webjars/font-awesome/css/all.css}">
+
+	<!-- Custom CSS -->
+	<link rel="stylesheet" type="text/css" th:href="@{/css/category.css}">
+
+	<title>[[${pageTitle}]]</title>
+
+	<!-- JS -->
+	<script type="text/javascript" th:src="@{/webjars/jquery/jquery.min.js}"></script>
+	<script type="text/javascript" th:src="@{/webjars/bootstrap/js/bootstrap.min.js}"></script>
+	<script type="text/javascript" th:src="@{/js/script.js}"></script>
+	<script type="text/javascript" th:src="@{/js/modal.js}"></script>
+	<script type="text/javascript">
+		function checkExisted(form) {
+			_url = "[[@{/categories/check_category}]]"
+			categoryId = $("#id").val();
+			categoryName = $("#name").val();
+			categoryTag = $("#tag").val();
+			csrfValue = $("input[name='_csrf']").val();
+			params = {id: categoryId, name: categoryName, tag: categoryTag, _csrf: csrfValue};
+			
+			$.post(_url, params, function(response) {
+				if (response == "OK") {
+					form.submit();
+				} else if (response == "Duplicate Name") {
+					showWarning("'" + categoryName + "'" + " category is already existed. Please choose another name.");
+				} else if (response == "Duplicate Tag") {
+					showWarning("'" + categoryTag + "'" + " tag is already existed. Please choose another tag.");
+				}
+			}).fail(function() {
+				showError("Could not connect to server");
+			});
+			
+			return false;
+		}
+	</script>
+	
+</head>
+
+<body>
+
+	<div th:if="${success != null}" class="alert alert-success text-center">[[${success}]]</div>
+	
+	<form th:action="@{/categories/save}" th:object="${category}" enctype="multipart/form-data" onsubmit="return checkExisted(this)" method="POST">
+		<input type="hidden" th:field="*{id}"/>
+		<div class="adduser-container container">
+			<div class="adduser-top w-100">
+				<h2>[[${pageTitle}]]</h2>
+			</div>
+			
+			<div class="inputs d-flex">
+	            <div class="form-group">
+	                <label class="form-control-placeholder" for="name">Category Name:</label>
+	                <input type="text" class="form-control" th:field="*{name}" required>
+	            </div>
+	            <div class="form-group">
+	                <label class="form-control-placeholder" for="tag">Tag:</label>
+	                <input type="text" class="form-control" th:field="*{tag}" required>
+	            </div>
+	            <div class="form-group">
+	                <label class="form-control-placeholder">Parent category:</label>
+	                <div class="dropdown">
+	                    <select class="btn" th:field="*{parent}">
+	                    	<option value="0" style="text-align: left;">[No Parent]</option>
+	                    	<th:block th:each="category : ${listCategories}">
+	                    		<option th:value="${category.id}" style="text-align: left;">[[${category.name}]]</option>
+	                    	</th:block>
+	                    </select>
+	                </div>
+	            </div>
+	        </div>			
+
+			<div class="checkbox-container w-100 d-flex">
+				<label class="checkbox-label" for="c1">Enabled</label>
+				<input type="checkbox" th:field="*{enabled}"/>
+			</div>
+
+			<div class="user-pic d-flex">
+				<div class="picture">
+					<input type="hidden" th:field="*{image}">
+					<img id="categoryImg" th:src="@{${category.imagePath}}" alt="">
+				</div>
+				<div class="select-picture">
+					<input type="file" name="imageFile" id="imageFile" accept="image/*" th:required="${category.imagePath == null}"/>
+				</div>
+	
+			</div>
+			
+			<div class="buttons w-100 d-flex">
+	            <div class="button-div">
+	                <input class="save-button" type="submit" value="Save">
+	                <input class="cancel-button" type="button" value="Cancel" id="btnCancel">
+	            </div>
+	        </div>
+			
+		</div>
+	</form>
+	
+	<div class="modal fade text-center" id="modalDialog">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h4 class="modal-title" id="modalTitle">Warning</h4>
+					<button type="button" class="close" data-dismiss="modal">&times;</button>
+				</div>
+				<div class="modal-body">
+					<span id="modalBody"></span>
+				</div>
+			</div>
+		</div>
+	</div>
+	
+</body>
+
+</html>

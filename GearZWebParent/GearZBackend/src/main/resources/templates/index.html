@@ -1,0 +1,1122 @@
+<!DOCTYPE html>
+<html xmlns:th="http://thymeleaf.org" xmlns:sec="http://thymeleaf.org/thymeleaf-extras-springsecurity5">
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+
+    <!-- Webjars CSS -->
+    <link rel="stylesheet" type="text/css" th:href="@{/webjars/bootstrap/css/bootstrap.min.css}">
+    <link rel="stylesheet" type="text/css" th:href="@{/webjars/font-awesome/css/all.css}">  
+    <link rel="stylesheet" type="text/css" th:href="@{/webjars/datatables/css/jquery.dataTables.min.css}">
+
+    <!-- Rich text -->
+	<link rel="stylesheet" type="text/css" th:href="@{/richtext/richtext.min.css}">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" type="text/css" th:href="@{/css/res.css}">
+    <link rel="stylesheet" type="text/css" th:href="@{/css/style.css}">
+
+    <title>Control Panel - GearZ</title>
+
+    <!-- JS -->
+    <script type="text/javascript" th:src="@{/webjars/jquery/jquery.min.js}"></script>
+    <script type="text/javascript" th:src="@{/webjars/datatables/js/jquery.dataTables.min.js}"></script>
+    <script type="text/javascript" th:src="@{/webjars/bootstrap/js/bootstrap.min.js}"></script>
+	<script type="text/javascript" th:src="@{/richtext/jquery.richtext.min.js}"></script>
+    
+    <script type="text/javascript">
+        contextPath = "[[@{/}]]"
+        var csrfHeaderName = "[[${_csrf.headerName}]]"
+        var csrfToken = "[[${_csrf.token}]]"
+        
+        $(document).ready(function () {
+            $("#customerVerificationContent").richText();
+            $("#orderConfirmationContent").richText();
+        })
+    </script>
+
+    <script type="text/javascript" th:src="@{/js/main.js}"></script>
+    <script type="text/javascript" th:src="@{/js/script.js}"></script>
+    <script type="text/javascript" th:src="@{/js/modal.js}"></script>
+    <script type="text/javascript" th:src="@{/js/settings/cities.js}"></script>
+    <script type="text/javascript" th:src="@{/js/settings/districts.js}"></script>
+    <script type="text/javascript" th:src="@{/js/settings/wards.js}"></script>
+    <script type="text/javascript" th:src="@{/js/order_shipper.js}"></script>
+
+</head>
+
+<body>
+    <nav class="navbar navbar-expand-md navbar-light bt-light sticky-top">
+        <div class="nav-container container-fluid">
+        
+        	<form th:hidden="true" th:action="@{/logout}" method="POST" name="logout">
+        		<input type="submit"/>
+        	</form>
+
+            <a th:href="@{/}" class="navbar-branch" >
+                <img class="navbar-img img-fluid" th:src="@{/img/gearz-logo-silver.png}" alt="">
+            </a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="navbarResponsive">
+                <ul class="navbar-nav ">
+                    <li class="nav-item"></li>
+
+                    <li class="nav-item dropdown no-arrow">
+                        <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
+                            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <img class="img-profile rounded-circle" th:src="@{${#authentication.principal.photo}}">
+                            <i sec:authentication="principal.fullname" style="color: white"></i> </a>
+                        <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in"
+                            aria-labelledby="userDropdown">
+                            <a class="dropdown-item" id="account-item" th:href="@{/account}" onclick="return openPopUp2(this)"> 
+                            	<i class="fa fa-user fa-sm fa-fw mr-2 text-gray-400"></i> Account
+							</a>
+                            <div class="dropdown-divider"></div>
+                            <a class="dropdown-item" href="#" data-toggle="modal" data-target="#logoutModal" id="logoutLink"> <i
+                                    class="fas fa-sign-out-alt"></i> Logout </a>
+                        </div>
+                    </li>
+
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="wrapper-container w-100 d-flex">
+
+		<!-- NAVIGATION BAR -->
+        <ul class="nav-left nav flex-column nav-pills" id="v-pills-tab" role="tablist" aria-orientation="vertical">
+            <li>
+            	<a class="navlink-left nav-link active" id="v-pills-dashboard-tab" data-toggle="pill" href="#v-pills-dashboard"
+            		role="tab" aria-controls="v-pills-dashboard" aria-selected="true">
+            	<i class="fas fa-columns"></i>Dashboard</a>
+            </li>
+            
+            <li sec:authorize="hasAuthority('Admin')">
+            	<a class="navlink-left nav-link" id="v-pills-users-tab" data-toggle="pill" href="#v-pills-users"
+                    role="tab" aria-controls="v-pills-users" aria-selected="false">
+                    <i class="fas fa-users"></i>Users</a>
+            </li>
+            
+            <th:block sec:authorize="hasAnyAuthority('Admin', 'Editor')">
+            	<li>
+            		<a class="navlink-left nav-link" id="v-pills-categories-tab" data-toggle="pill"
+                	    href="#v-pills-categories" role="tab" aria-controls="v-pills-categories" aria-selected="false">
+                    	<i class="fas fa-list"></i>Categories</a>
+				</li>
+            </th:block>
+			
+			<th:block sec:authorize="hasAnyAuthority('Admin', 'Editor')">
+	            <li>
+	            	<a class="navlink-left nav-link" id="v-pills-brands-tab" data-toggle="pill" href="#v-pills-brands"
+	                    role="tab" aria-controls="v-pills-brands" aria-selected="false">
+	                    <i class="fas fa-copyright"></i>Brands</a>
+				</li>
+			</th:block>
+			
+            <th:block sec:authorize="hasAnyAuthority('Admin', 'Editor', 'Salesperson', 'Shipper')">
+                <li>
+                    <a class="navlink-left nav-link" id="v-pills-products-tab" data-toggle="pill" href="#v-pills-products"
+                        role="tab" aria-controls="v-pills-products" aria-selected="false">
+                        <i class="fas fa-shopping-cart"></i>Products</a>
+                </li>
+            </th:block>
+            
+            <th:block sec:authorize="hasAnyAuthority('Admin', 'Salesperson')">
+	            <li><a class="navlink-left nav-link" id="v-pills-customers-tab" data-toggle="pill" href="#v-pills-customers"
+	                    role="tab" aria-controls="v-pills-customers" aria-selected="false">
+	                    <i class="fas fa-user-friends"></i>Customers</a>
+				</li>
+			</th:block>
+			
+			<th:block sec:authorize="hasAnyAuthority('Admin', 'Salesperson')">
+	            <li><a class="navlink-left nav-link" id="v-pills-shipping-tab" data-toggle="pill" href="#v-pills-shipping"
+	                    role="tab" aria-controls="v-pills-shipping" aria-selected="false">
+	                    <i class="fas fa-shipping-fast"></i>Shipping</a>
+				</li>
+			</th:block>
+			
+			<th:block sec:authorize="hasAnyAuthority('Admin', 'Shipper', 'Salesperson')">
+	            <li><a class="navlink-left nav-link" id="v-pills-orders-tab" data-toggle="pill" href="#v-pills-orders"
+	                    role="tab" aria-controls="v-pills-orders" aria-selected="false">
+	                    <i class="fas fa-file-invoice-dollar"></i>Orders</a>
+				</li>
+			</th:block>
+			
+			<th:block sec:authorize="hasAnyAuthority('Admin', 'Salesperson')">
+	            <li><a class="navlink-left nav-link" id="v-pills-reports-tab" data-toggle="pill" href="#v-pills-reports"
+	                    role="tab" aria-controls="v-pills-reports" aria-selected="false">
+	                    <i class="fas fa-chart-line"></i>Sales Report</a>
+				</li>
+			</th:block>
+			
+			<th:block sec:authorize="hasAnyAuthority('Admin', 'Editor')">
+	            <li><a class="navlink-left nav-link" id="v-pills-articles-tab" data-toggle="pill" href="#v-pills-articles"
+	                    role="tab" aria-controls="v-pills-articles" aria-selected="false">
+	                    <i class="far fa-newspaper"></i>Articles</a>
+				</li>
+			</th:block>
+			
+            <li sec:authorize="hasAuthority('Admin')">
+            	<a class="navlink-left nav-link" id="v-pills-settings-tab" data-toggle="pill" href="#v-pills-settings"
+                    role="tab" aria-controls="v-pills-settings" aria-selected="false">
+                    <i class="fas fa-cogs"></i>Settings</a>
+			</li>
+        </ul>
+
+        <div class="tab-content" id="v-pills-tabContent">
+            <div class="tab-pane fade show active" id="v-pills-dashboard" role="tabpanel"
+                aria-labelledby="v-pills-dashboard-tab">
+                <div class="rightside-bar">
+                    <div class="rightside-bar-container">
+                        <div class="dashboard-row row d-flex">
+                            <h4>Dashboard</h4>
+                            <p>
+                            	Welcome, <a th:href="@{/account}" sec:authentication="principal.fullname"></a>
+                            	<i sec:authentication="principal.authorities"></i>
+                            </p> 
+                        </div>
+                        <div class="sale-row d-flex">
+                            <div class="sale-left col-md-8 ">
+                                <div class="sale-left-container">
+
+                                </div>
+                            </div>
+                            <div class="sale-right col-md-4">
+                                <div class="sale-right-container"></div>
+                            </div>
+                        </div>
+                        <div class="top-selling">
+                            <div class="top-selling-container col-md-12"></div>
+                        </div>
+                        <div class="comment-row d-flex">
+                            <div class="comment-left col-md-6">
+                                <div class="comment-left-container"></div>
+                            </div>
+                            <div class="comment-right col-md-6">
+                                <div class="comment-right-container">
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="tab-pane fade" id="v-pills-users" role="tabpanel" aria-labelledby="v-pills-users-tab">
+                <div class="rightside-bar">
+                    <div class="rightside-bar-container">
+                        <div class="dashboard-row row d-flex">
+                            <h4>Manage Users</h4>
+                            <div class="mt-2 col-md-12">
+                                <a class="btn btn-primary" th:href="@{/users/new}" role="button" id="btnAdd"
+                                    onclick="return openPopUp(this)"><i class="fas fa-plus-circle" id="btnAdd"></i> Add new user</a>
+                                <a class="btn btn-info" th:href="@{/users/export/csv}" role="button"><i class="fas fa-file-csv"></i> Export to CSV</a>
+                                <a class="btn btn-success" th:href="@{/users/export/xlsx}" role="button"><i class="fas fa-file-excel"></i> Export to XLSX</a>
+                                <a class="btn btn-warning" th:href="@{/users/export/pdf}" role="button"><i class="fas fa-file-pdf"></i> Export to PDF</a>
+                            </div>
+                            <div class="mt-2 col-md-12">
+                            	<div th:if="${msg != null}" class="alert alert-info text-center">[[${msg}]]</div>
+                                <table class="display table table-bordered table-striped table-hover table-responsive-xl" id="tableUsers">
+                                    <thead class="thead-dark">
+                                        <tr>
+                                            <th>ID</th>
+                                            <th>Profile picture</th>
+                                            <th>First name</th>
+                                            <th>Last name</th>
+                                            <th>Email</th>
+                                            <th>Roles</th>
+                                            <th>Enabled</th>
+                                            <th></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr th:each="user : ${listUsers}">
+                                            <td>[[${user.id}]]</td>
+                                            <td>
+                                            	<img th:if="${user.profilePic == null}" th:src="@{${user.imagePath}}" width="100" height="100"/>
+                                            	<img th:if="${user.profilePic != null}" th:src="@{${user.imagePath}}" width="100" height="100"/>
+                                            </td>
+                                            <td>[[${user.firstName}]]</td>
+                                            <td>[[${user.lastName}]]</td>
+                                            <td>[[${user.email}]]</td>
+                                            <td>[[${user.roles}]]</td>
+                                            <td>
+                                                <a th:if="${user.enabled == true}" th:href="@{'/users/' + ${user.id} + '/enabled/false'}" class="fas fa-check-circle fa-2x" title="Disable this user" style="color: cornflowerblue;"></a>
+                                                <a th:if="${user.enabled == false}" th:href="@{'/users/' + ${user.id} + '/enabled/true'}" class="fas fa-circle fa-2x" title="Enable this user" style="color: gray;"></a>
+                                            </td>
+                                            <td>
+                                                <a class="btn btn-primary" role="button" th:href="@{/users/edit/{id}(id=${user.id})}" th:id="'btnEditUser' + ${user.id}" title="Edit this user" onclick="return openPopUp(this)"><i class="fas fa-edit" th:id="'btnEditUser' + ${user.id}"></i> Edit</a> &nbsp;
+                                                <a class="btn btn-danger button-delete-user" role="button" th:href="@{/users/delete/{id}(id=${user.id})}" th:entity="${user.firstName} + ' ' + ${user.lastName}" th:id="'btnDeleteUser' + ${user.id}" title="Delete this user"><i class="fas fa-trash" th:id="'btnDeleteUser' + ${user.id}"></i> Delete</a>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                    <tfoot class="thead-dark">
+                                    	<tr>
+                                    		<th>ID</th>
+                                            <th>Profile picture</th>
+                                            <th>Email</th>
+                                            <th>First name</th>
+                                            <th>Last name</th>
+                                            <th>Roles</th>
+                                            <th>Enabled</th>
+                                            <th></th>
+                                    	</tr>
+                                    </tfoot>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="tab-pane fade" id="v-pills-categories" role="tabpanel" aria-labelledby="v-pills-categories-tab">
+                <div class="rightside-bar">
+                    <div class="rightside-bar-container">
+                        <div class="dashboard-row row d-flex">
+                            <h4>Manage Categories</h4>
+                            <div class="mt-2 col-md-12">
+                                <a class="btn btn-primary" th:href="@{/categories/new}" role="button" id="btnAddCat"
+                                    onclick="return openPopUp(this)"><i class="fas fa-plus-circle" id="btnAddCat"></i> Add new category</a>
+                                <a class="btn btn-info" th:href="@{/categories/export/csv}" role="button"><i class="fas fa-file-csv"></i> Export to CSV</a>
+                            </div>
+                            <div class="mt-2 col-md-12">
+                            	<div th:if="${msg != null}" class="alert alert-info text-center">[[${msg}]]</div>
+                                <table class="display table table-bordered table-striped table-hover table-responsive-xl" id="tableCategories">
+                                    <thead class="thead-dark">
+                                        <tr>
+                                            <th class="no-sort">ID</th>
+                                            <th>
+                                            	<a class="text-white" th:href="@{'/?categoriesSortDir=' + ${sortDir}}">Name</a>
+                                            	<span th:class="${sortDir == 'asc' ? 'fas fa-sort-up' : 'fas fa-sort-down'}"></span>
+                                            </th>
+                                            <th>Tag</th>
+                                            <th>Enabled</th>
+                                            <th></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr th:each="categories : ${listCategories}">
+                                            <td>[[${categories.id}]]</td>
+                                            <td>[[${categories.name}]]</td>
+                                            <td>[[${categories.tag}]]</td>
+                                            <td>
+                                                <a th:if="${categories.enabled == true}" th:href="@{'/categories/' + ${categories.id} + '/enabled/false'}" class="fas fa-check-circle fa-2x" title="Disable this category" style="color: cornflowerblue;"></a>
+                                                <a th:if="${categories.enabled == false}" th:href="@{'/categories/' + ${categories.id} + '/enabled/true'}" class="fas fa-circle fa-2x" title="Enable this category" style="color: gray;"></a>
+                                            </td>
+                                            <td>
+                                                <a class="btn btn-primary" role="button" th:href="@{/categories/edit/{id}(id=${categories.id})}" th:id="'btnEditCategory' + ${categories.id}" title="Edit this category" onclick="return openPopUp(this)"><i class="fas fa-edit" th:id="'btnEditCategory' + ${categories.id}"></i> Edit</a> &nbsp;
+                                                <th:block th:if="${categories.hasChildren == false}">
+	                                            <a class="btn btn-danger button-delete-category" role="button" th:href="@{/categories/delete/{id}(id=${categories.id})}" th:entity="${categories.name}" th:id="'btnDeleteCategory' + ${categories.id}" title="Delete this category"><i class="fas fa-trash" th:id="'btnDeleteCategory' + ${categories.id}"></i> Delete</a>
+                                                </th:block>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                    <tfoot class="thead-dark">
+                                    	<tr>
+                                    		<th class="no-sort">ID</th>
+                                            <th>
+                                            	<a class="text-white" th:href="@{'/?categoriesSortDir=' + ${sortDir}}">Name</a>
+                                            	<span th:class="${sortDir == 'asc' ? 'fas fa-sort-up' : 'fas fa-sort-down'}"></span>
+                                            </th>
+                                            <th>Tag</th>
+                                            <th>Enabled</th>
+                                            <th></th>
+                                    	</tr>
+                                    </tfoot>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="tab-pane fade" id="v-pills-brands" role="tabpanel" aria-labelledby="v-pills-brands-tab">
+                <div class="rightside-bar">
+                    <div class="rightside-bar-container">
+                        <div class="dashboard-row row d-flex">
+                            <h4>Manage Brands</h4>
+                            <div class="mt-2 col-md-12">
+                                <a class="btn btn-primary" th:href="@{/brands/new}" role="button" id="btnAddBrand"
+                                    onclick="return openPopUp(this)"><i class="fas fa-plus-circle" id="btnAddBrand"></i> Add new brand</a>
+                                <a class="btn btn-info" th:href="@{/brands/export/csv}" role="button"><i class="fas fa-file-csv"></i> Export to CSV</a>
+                            </div>
+                            <div class="mt-2 col-md-12">
+                            	<div th:if="${msg != null}" class="alert alert-info text-center">[[${msg}]]</div>
+                                <table class="display table table-bordered table-striped table-hover table-responsive-xl" id="tableBrands">
+                                    <thead class="thead-dark">
+                                        <tr>
+                                            <th>ID</th>
+                                            <th>Logo</th>
+                                            <th>Name</th>
+                                            <th>Categories</th>
+                                            <th></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr th:each="brand : ${listBrands}">
+                                            <td>[[${brand.id}]]</td>
+                                            <td>
+                                            	<img th:src="@{${brand.logoPath}}" width="120" height="100"/>
+                                            </td>
+                                            <td>[[${brand.name}]]</td>
+                                            <td>
+                                            	<th:block th:each="c : ${brand.categories}">
+                                            	    <span class="badge badge-secondary" th:text="${c.name}"></span>
+                                            	</th:block>
+                                            </td>
+                                            <td>
+                                                <a class="btn btn-primary" role="button" th:href="@{/brands/edit/{id}(id=${brand.id})}" th:id="'btnEditBrand' + ${brand.id}" title="Edit this brand" onclick="return openPopUp(this)"><i class="fas fa-edit" th:id="'btnEditBrand' + ${brand.id}"></i> Edit</a> &nbsp;
+                                                <a class="btn btn-danger button-delete-brand" role="button" th:href="@{/brands/delete/{id}(id=${brand.id})}" th:entity="${brand.name}" th:id="'btnDeleteBrand' + ${brand.id}" title="Delete this brand"><i class="fas fa-trash" th:id="'btnDeleteBrand' + ${brand.id}"></i> Delete</a>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                    <tfoot class="thead-dark">
+                                    	<tr>
+                                    		<th>ID</th>
+                                            <th>Logo</th>
+                                            <th>Name</th>
+                                            <th>Categories</th>
+                                            <th></th>
+                                    	</tr>
+                                    </tfoot>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="tab-pane fade" id="v-pills-products" role="tabpanel" aria-labelledby="v-pills-products-tab">
+                <div class="rightside-bar">
+                    <div class="rightside-bar-container">
+                        <div class="dashboard-row row d-flex">
+                            <h4>Manage Products</h4>
+			                <th:block sec:authorize="hasAnyAuthority('Admin', 'Editor')">
+                            <div class="mt-2 col-md-12">
+                                <a class="btn btn-primary" th:href="@{/products/new}" role="button" id="btnAddProduct"
+                                    onclick="return openPopUp(this)"><i class="fas fa-plus-circle" id="btnAddProduct"></i> Add new product</a>
+                                <a class="btn btn-info" th:href="@{/products/export/csv}" role="button"><i class="fas fa-file-csv"></i> Export to CSV</a>
+                            </div>
+                            </th:block>
+                            <div class="mt-2 col-md-12">
+                                <div id="dropdownCategoryFilter">
+                                    Category:&nbsp;
+                                    <select id="categoryFilter">
+                                        <option value="">Show All</option>
+                                        <th:block th:each="c : ${categoryList}">
+                                        <option th:value="${c.name}">[[${c.name}]]</option>
+                                        </th:block>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="mt-2 col-md-12">
+                            	<div th:if="${msg != null}" class="alert alert-info text-center">[[${msg}]]</div>
+                                <table class="display table table-bordered table-striped table-hover table-responsive-xl" id="tableProducts">
+                                    <thead class="thead-dark">
+                                        <tr>
+                                            <th>ID</th>
+                                            <th>Image</th>
+                                            <th>Product Name</th>
+                                            <th>Brand</th>
+                                            <th>Categories</th>
+                                            <th:block sec:authorize="hasAnyAuthority('Admin', 'Editor')">
+                                            <th>Enabled</th>
+                                            </th:block>
+                                            <th></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr th:each="product : ${listProducts}">
+                                            <td>[[${product.id}]]</td>
+                                            <td>
+                                            	<img th:src="@{${product.mainImagePath}}" width="100" height="100"/>
+                                            </td>
+                                            <td>[[${product.name}]]</td>
+                                            <td>[[${product.brand.name}]]</td>
+                                            <td>[[${product.category.name}]]</td>
+			                                <th:block sec:authorize="hasAnyAuthority('Admin', 'Editor')">
+                                            <td>
+                                                <a th:if="${product.enabled == true}" th:href="@{'/products/' + ${product.id} + '/enabled/false'}" class="fas fa-check-circle fa-2x" title="Disable this product" style="color: cornflowerblue;"></a>
+                                                <a th:if="${product.enabled == false}" th:href="@{'/products/' + ${product.id} + '/enabled/true'}" class="fas fa-circle fa-2x" title="Enable this product" style="color: gray;"></a>
+                                            </td>
+                                            </th:block>
+                                            <td>
+                                                <a class="btn btn-success button-product-detail" role="button" th:href="@{/products/details/{id}(id=${product.id})}" title="View details of this product"><i class="fas fa-info-circle"></i></a>
+                                    
+                                                <th:block sec:authorize="hasAnyAuthority('Admin', 'Editor', 'Salesperson')">
+                                                <a class="btn btn-primary" role="button" th:href="@{/products/edit/{id}(id=${product.id})}" th:id="'btnEditProduct' + ${product.id}" title="Edit this product" onclick="return openPopUp(this)"><i class="fas fa-edit" th:id="'btnEditProduct' + ${product.id}"></i></a>
+                                                </th:block>
+
+			                                    <th:block sec:authorize="hasAnyAuthority('Admin', 'Editor')">
+                                                <a class="btn btn-danger button-delete-product" role="button" th:href="@{/products/delete/{id}(id=${product.id})}" th:entity="${product.name}" th:id="'btnDeleteProduct' + ${product.id}" title="Delete this product"><i class="fas fa-trash" th:id="'btnDeleteProduct' + ${product.id}"></i></a>
+                                                </th:block>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                    <tfoot class="thead-dark">
+                                    	<tr>
+                                    		<th>ID</th>
+                                            <th>Image</th>
+                                            <th>Product Name</th>
+                                            <th>Brand</th>
+                                            <th>Categories</th>
+                                            <th:block sec:authorize="hasAnyAuthority('Admin', 'Editor')">
+                                            <th>Enabled</th>
+                                            </th:block>
+                                            <th></th>
+                                    	</tr>
+                                    </tfoot>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="tab-pane fade" id="v-pills-customers" role="tabpanel" aria-labelledby="v-pills-customers-tab">
+                <div class="rightside-bar">
+                    <div class="rightside-bar-container">
+                        <div class="dashboard-row row d-flex">
+                            <h4>Manage Customers</h4>
+                            <div th:if="${msg != null}" class="alert alert-info text-center">[[${msg}]]</div>
+                            <table class="display table table-bordered table-striped table-hover table-responsive-xl" id="tableCustomers">
+                                <thead class="thead-dark">
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Full Name</th>
+                                        <th>E-mail</th>
+                                        <th>Ward</th>
+                                        <th>District</th>
+                                        <th>City</th>
+                                        <th>Enabled</th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr th:each="customer : ${listCustomers}">
+                                        <td>[[${customer.id}]]</td>
+                                        <td>[[${customer.fullName}]]</td>
+                                        <td>[[${customer.email}]]</td>
+                                        <td>
+                                            <th:block th:if="${customer.ward != null}">
+                                                [[${customer.ward.name}]]
+                                            </th:block>
+                                        </td>
+                                        <td>
+                                            <th:block th:if="${customer.district != null}">
+                                                [[${customer.district.name}]]
+                                            </th:block>
+                                        </td>
+                                        <td>
+                                            <th:block th:if="${customer.city != null}">
+                                                [[${customer.city.name}]]
+                                            </th:block>
+                                        </td>
+                                        <td>
+                                            <a th:if="${customer.enabled == true}" th:href="@{'/customers/' + ${customer.id} + '/enabled/false'}" class="fas fa-check-circle fa-2x" title="Disable this customer" style="color: cornflowerblue;"></a>
+                                            <a th:if="${customer.enabled == false}" th:href="@{'/customers/' + ${customer.id} + '/enabled/true'}" class="fas fa-circle fa-2x" title="Enable this customer" style="color: gray;"></a>
+                                        </td>
+                                        <td>
+                                            <a class="btn btn-success button-customer-detail" role="button" th:href="@{/customers/details/{id}(id=${customer.id})}" title="View details of this customer"><i class="fas fa-info-circle"></i></a>
+                                            <a class="btn btn-danger button-delete-customer" role="button" th:href="@{/customers/delete/{id}(id=${customer.id})}" th:entity="${customer.fullName}" th:id="'btnDeleteCustomer' + ${customer.id}" title="Delete this customer"><i class="fas fa-trash" th:id="'btnDeleteCustomer' + ${customer.id}"></i></a>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                                <tfoot class="thead-dark">
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Full Name</th>
+                                        <th>E-mail</th>
+                                        <th>Ward</th>
+                                        <th>District</th>
+                                        <th>City</th>
+                                        <th>Enabled</th>
+                                        <th></th>
+                                    </tr>
+                                </tfoot>
+                            </table>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="tab-pane fade" id="v-pills-shipping" role="tabpanel" aria-labelledby="v-pills-shipping-tab">
+                <div class="rightside-bar">
+                    <div class="rightside-bar-container">
+                        <div class="dashboard-row row d-flex">
+                            <h4>Manage Shipping Rates</h4>
+                            <div class="mt-2 col-md-12">
+                                <a class="btn btn-primary" th:href="@{/shipping_rates/new}" role="button" id="btnAddShippingRate"
+                                onclick="return openPopUp(this)"><i class="fas fa-plus-circle" id="btnAddShippingRate"></i> Add new shipping rate</a>
+                            </div>
+                            <div class="mt-2 col-md-12">
+                                <div th:if="${message != null}" class="alert alert-info text-center">[[${message}]]</div>
+                                <table class="display table table-bordered table-striped table-hover table-responsive-xl" id="tableShippingRates">
+                                    <thead class="thead-dark">
+                                        <tr>
+                                            <th>ID</th>
+                                            <th>City</th>
+                                            <th>District</th>
+                                            <th>Rate</th>
+                                            <th>Day(s)</th>
+                                            <th>COD Supported</th>
+                                            <th></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr th:each="rate : ${listShippingRates}">
+                                            <td>[[${rate.id}]]</td>
+                                            <td>[[${rate.city.name}]]</td>
+                                            <td>[[${rate.district}]]</td>
+                                            <td>[[${rate.rate}]]</td>
+                                            <td>[[${rate.days}]]</td>
+                                            <td>
+                                                <a th:if="${rate.codSupported == true}" th:href="@{'/shipping_rates/cod/' + ${rate.id} + '/enabled/false'}" class="fas fa-check-circle fa-2x" title="Disable this shipping rate" style="color: cornflowerblue;"></a>
+                                                <a th:if="${rate.codSupported == false}" th:href="@{'/shipping_rates/cod/' + ${rate.id} + '/enabled/true'}" class="fas fa-circle fa-2x" title="Enable this shipping rate" style="color: gray;"></a>
+                                            </td>
+                                            <td>
+                                                <a class="btn btn-primary" role="button" th:href="@{/shipping_rates/edit/{id}(id=${rate.id})}" th:id="'btnEditShippingRate' + ${rate.id}" title="Edit this shipping rate" onclick="return openPopUp(this)"><i class="fas fa-edit" th:id="'btnEditShippingRate' + ${rate.id}"></i></a>
+                                                <a class="btn btn-danger button-delete-rate" role="button" th:href="@{/shipping_rates/delete/{id}(id=${rate.id})}" th:entity="${rate.district} + ', ' + ${rate.city.name}" th:id="'btnDeleteShippingRate' + ${rate.id}" title="Delete this shipping rate"><i class="fas fa-trash" th:id="'btnDeleteShippingRate' + ${rate.id}"></i></a>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                    <tfoot class="thead-dark">
+                                        <tr>
+                                            <th>ID</th>
+                                            <th>City</th>
+                                            <th>District</th>
+                                            <th>Rate</th>
+                                            <th>Day(s)</th>
+                                            <th>COD Supported</th>
+                                            <th></th>
+                                        </tr>
+                                    </tfoot>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="tab-pane fade" id="v-pills-orders" role="tabpanel" aria-labelledby="v-pills-orders-tab">
+                <div class="rightside-bar">
+                    <div class="rightside-bar-container">
+                        <div class="dashboard-row row d-flex">
+                            <h4>Manage Orders</h4>
+                            <th:block sec:authorize="hasAnyAuthority('Admin', 'Salesperson')">
+                            <div class="mt-2 col-md-12">
+                                <div th:if="${message != null}" class="alert alert-info text-center">[[${message}]]</div>
+                                <table class="display table table-bordered table-striped table-hover table-responsive-xl" id="tableOrders">
+                                    <thead class="thead-dark">
+                                        <tr>
+                                            <th>ID</th>
+                                            <th>Customer</th>
+                                            <th>Total</th>
+                                            <th>Order Time</th>
+                                            <th>Destination</th>
+                                            <th>Payment Method</th>
+                                            <th>Status</th>
+                                            <th></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr th:each="order : ${listOrders}">
+                                            <td>[[${order.id}]]</td>
+                                            <td>
+                                                <a class="customer-details-link" th:href="@{'/customers/details/' + ${order.customer.id}}">[[${order.customer.fullName}]]</a>
+                                            </td>
+                                            <td>
+                                                <span>$[[${#numbers.formatDecimal(order.total, 1, 'DEFAULT', 2, 'POINT')}]]</span>
+                                            </td>
+                                            <td>
+                                                <span th:text="${#dates.format(order.orderTime, 'yyyy-MM-dd HH:mm:ss')}"></span>
+                                            </td>
+                                            <td>[[${order.destination}]]</td>
+                                            <td>[[${order.paymentMethod}]]</td>
+                                            <td>[[${order.status}]]</td>
+                                            <td>
+                                                <a class="btn btn-success button-order-detail" role="button" th:href="@{/orders/details/{id}(id=${order.id})}" title="View details of this order"><i class="fas fa-info-circle"></i></a>
+                                                <a class="btn btn-primary" role="button" th:href="@{/orders/edit/{id}(id=${order.id})}" th:id="'btnEditOrder' + ${order.id}" title="Edit this order" onclick="return openPopUp(this)"><i class="fas fa-edit" th:id="'btnEditOrder' + ${order.id}"></i></a>
+                                                <a class="btn btn-danger button-delete-order" role="button" th:href="@{/orders/delete/{id}(id=${order.id})}" th:entity="${order.id}" th:id="'btnDeleteOrder' + ${order.id}" title="Delete this order"><i class="fas fa-trash" th:id="'btnDeleteOrder' + ${order.id}"></i></a>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                    <tfoot class="thead-dark">
+                                        <tr>
+                                            <th>ID</th>
+                                            <th>Customer</th>
+                                            <th>Total</th>
+                                            <th>Order Time</th>
+                                            <th>Destination</th>
+                                            <th>Payment Method</th>
+                                            <th>Status</th>
+                                            <th></th>
+                                        </tr>
+                                    </tfoot>
+                                </table>
+                            </div>
+                            </th:block>
+                            
+                            <th:block sec:authorize="hasAnyAuthority('Shipper')">
+                                <div>
+                                    <table class="display table table-bordered table-striped table-hover table-responsive-xl" id="tableOrdersForShipper">
+                                        <thead class="thead-dark">
+                                            <tr>
+                                                <th>ID</th>
+                                                <th><i class="fas fa-user"></i>&nbsp; Recipient Name</th>
+                                                <th><i class="fas fa-home"></i>&nbsp; Recipient Address</th>
+                                                <th><i class="fas fa-phone"></i>&nbsp; Telephone</th>
+                                                <th><i class="fas fa-coins"></i>&nbsp; Cash on Delivery</th>
+                                                <th><i class="far fa-clock"></i>&nbsp; Status</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr th:each="order : ${listOrders}">
+                                                <td>[[${order.id}]] <a class="btn btn-success button-order-detail" role="button" th:href="@{/orders/details/{id}(id=${order.id})}" title="View details of this order"><i class="fas fa-info-circle"></i></a></td>
+                                                <td>[[${order.fullName}]]</td>
+                                                <td>[[${order.recipientAddress}]]</td>
+                                                <td>[[${order.phoneNumber}]]</td>
+                                                <td th:if="${order.COD}"><span>$[[${#numbers.formatDecimal(order.total, 1, 'DEFAULT', 2, 'POINT')}]]</span></td>
+                                                <td th:unless="${order.COD}"><span>$0</span></td>
+                                                <td>
+                                                    <th:block th:if="${order.picked}">
+                                                        <a class="btn btn-success" role="button" onclick="return false;"><i class="fas fa-people-carry"></i></a>
+                                                    </th:block>
+                                                    <th:block th:unless="${order.picked}">
+                                                        <a class="btn btn-secondary link-update-status" role="button" th:id="'linkPICKED' + ${order.id}" th:orderId="${order.id}" status="PICKED" th:href="@{'/orders_shipper/update/' + ${order.id} + '/PICKED'}"><i class="fas fa-people-carry"></i></a>
+                                                    </th:block>
+
+                                                    <th:block th:if="${order.shipping}">
+                                                        <a class="btn btn-success" role="button" onclick="return false;"><i class="fas fa-shipping-fast"></i></a>
+                                                    </th:block>
+                                                    <th:block th:unless="${order.shipping}">
+                                                        <a class="btn btn-secondary link-update-status" role="button" th:id="'linkSHIPPING' + ${order.id}" th:orderId="${order.id}" status="SHIPPING" th:href="@{'/orders_shipper/update/' + ${order.id} + '/SHIPPING'}"><i class="fas fa-shipping-fast"></i></a>
+                                                    </th:block>
+
+                                                    <th:block th:if="${order.delivered}">
+                                                        <a class="btn btn-success" role="button" onclick="return false;"><i class="fas fa-box-open"></i></a>
+                                                    </th:block>
+                                                    <th:block th:unless="${order.delivered}">
+                                                        <a class="btn btn-secondary link-update-status" role="button" th:id="'linkDELIVERED' + ${order.id}" th:orderId="${order.id}" status="DELIVERED" th:href="@{'/orders_shipper/update/' + ${order.id} + '/DELIVERED'}"><i class="fas fa-box-open"></i></a>
+                                                    </th:block>
+
+                                                    <th:block th:if="${order.returned}">
+                                                        <a class="btn btn-success" role="button" onclick="return false;"><i class="fas fa-undo"></i></a>
+                                                    </th:block>
+                                                    <th:block th:unless="${order.returned}">
+                                                        <a class="btn btn-secondary link-update-status" role="button" th:id="'linkRETURNED' + ${order.id}" th:orderId="${order.id}" status="RETURNED" th:href="@{'/orders_shipper/update/' + ${order.id} + '/RETURNED'}"><i class="fas fa-undo"></i></a>
+                                                    </th:block>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                        <tfoot class="thead-dark">
+                                            <tr>
+                                                <th>ID</th>
+                                                <th><i class="fas fa-user"></i>&nbsp; Recipient Name</th>
+                                                <th><i class="fas fa-home"></i>&nbsp; Recipient Address</th>
+                                                <th><i class="fas fa-phone"></i>&nbsp; Telephone</th>
+                                                <th><i class="fas fa-coins"></i>&nbsp; Cash on Delivery</th>
+                                                <th><i class="far fa-clock"></i>&nbsp; Status</th>
+                                            </tr>
+                                        </tfoot>
+                                    </table>
+                                </div>
+                            </th:block>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="tab-pane fade" id="v-pills-reports" role="tabpanel" aria-labelledby="v-pills-reports-tab">
+                <div class="rightside-bar">
+                    <div class="rightside-bar-container">
+                        <div class="dashboard-row row d-flex">
+                            <h4>Sales Report</h4>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="tab-pane fade" id="v-pills-articles" role="tabpanel" aria-labelledby="v-pills-articles-tab">
+                <div class="rightside-bar">
+                    <div class="rightside-bar-container">
+                        <div class="dashboard-row row d-flex">
+                            <h4>Articles</h4>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="tab-pane fade" id="v-pills-settings" role="tabpanel" aria-labelledby="v-pills-settings-tab">
+                <div class="rightside-bar">
+                    <div class="rightside-bar-container">
+                        <div class="dashboard-row row d-flex">
+                            <h4>Site Settings</h4>
+                            <div th:if="${message != null}" class="alert alert-success text-center">[[${message}]]</div>
+                            <div class="container card d-flex justify-content-center" id="setting-container">
+			                    <div class="container-content">
+                                    <ul class="nav nav-pills m-3 shadow-sm" id="setting-tab" role="tablist">
+                                        <li class="nav-item">
+                                            <a class="nav-link active" data-toggle="pill" href="#pills-general" role="tab">General</a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a class="nav-link" data-toggle="pill" href="#pills-cities" role="tab">Cities</a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a class="nav-link" data-toggle="pill" href="#pills-districts" role="tab">Districts</a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a class="nav-link" data-toggle="pill" href="#pills-wards" role="tab">Wards</a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a class="nav-link" data-toggle="pill" href="#pills-mailserver" role="tab">Mail Server</a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a class="nav-link" data-toggle="pill" href="#pills-mailtemplate" role="tab">Mail Template</a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a class="nav-link" data-toggle="pill" href="#pills-payment" role="tab">Payment</a>
+                                        </li>
+                                    </ul>
+                                    <div class="tab-content">
+                                        <div class="tab-pane fade show active" id="pills-general" role="tabpanel">
+                                            <form th:action="@{/settings/save_general}" method="post" enctype="multipart/form-data">
+                                                <ul class="ccontent">
+                                                    <li>
+                                                        <div class="form-group d-flex ">
+                                                            <label style="width: 120px; display: flex; align-items: center; margin-bottom: 0; font-weight: 500;">Site Name:</label>
+                                                            <input type="text" name="SITE_NAME" th:value="${SITE_NAME}" class="form-control" required>
+                                                        </div>
+                                                    </li>
+                                                    <li>
+                                                        <div class="form-group d-flex ">
+                                                            <label style="width: 120px; display: flex; align-items: center; margin-bottom: 0; font-weight: 500;">Copyright:</label>
+                                                            <input type="text" name="COPYRIGHT" th:value="${COPYRIGHT}" class="form-control" required>
+                                                        </div>
+                                                    </li>
+                                                    <li>
+                                                        <div class="form-group d-flex ">
+                                                            <label style="width: 120px; display: flex; align-items: center; margin-bottom: 0; font-weight: 500;">Site logo:</label>
+                                                            <img class="img-fluid" style="padding-right: 20px; width: 10%; height: 10%;" th:src="@{${SITE_LOGO}}" alt="Image preview" id="site-logo">
+                                                            <input type="file" name="imageFile" id="imageFile" accept="image/*">
+                                                        </div>
+                                                    </li>
+                                                </ul>
+                                                <div class="text-left">
+                                                    <input class="btn btn-primary m-3" type="submit" value="Save" />
+                                                </div>
+                                            </form>
+                                        </div>
+                                        <div class="tab-pane fade" id="pills-cities" role="tabpanel">
+                                            <ul class="ccontent">
+                                                <li>
+                                                    <div class="form-group d-flex ">
+                                                        <input class="btn btn-primary" type="button" id="btnLoadCities" value="Load Cities">
+                                                    </div>
+                                                </li>
+                                                <li>
+                                                    <div class="form-group d-flex ">
+                                                        <select class="form-control" style="height: 300px;" size="3" id="dropDownCities">
+                                                        </select>
+                                                    </div>
+                                                </li>
+                                                <li>
+                                                    <form id="formCity">
+                                                        <div class="form-group d-flex ">
+                                                            <label class="col-form-label" id="labelCityName">City:</label>
+                                                            <div class="col-md">
+                                                                <input type="text" class="form-control" id="fieldCityName" required minlength="3" maxlength="30"/>
+                                                            </div>
+                                                            <label class="col-form-label">Code:</label>
+                                                            <div class="col-md">
+                                                                <input type="text" class="form-control" id="fieldCityCode" required minlength="2" maxlength="3"/>
+                                                            </div>
+                                                            <div class="col-lg-4">
+                                                                <input class="btn btn-secondary mr-2" type="button" id="btnAddCity" value="Add">
+                                                                <input class="btn btn-secondary mr-2" type="button" id="btnUpdateCity" value="Update">
+                                                                <input class="btn btn-secondary mr-2" type="button" id="btnDeteleCity" value="Delete">
+                                                            </div>
+                                                        </div>
+                                                    </form>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                        <div class="tab-pane fade" id="pills-districts" role="tabpanel">
+                                            <ul class="ccontent">
+                                                <li>
+                                                    <div class="form-group d-flex ">
+                                                        <input class="btn btn-primary" type="button" id="btnLoadCitiesForDistricts" value="Load Cities List">
+                                                    </div>
+                                                </li>
+                                                <li>
+                                                    <div class="form-group d-flex ">
+                                                        <label class="col-form-label" style="width: 120px; display: flex; align-items: center; margin-bottom: 0; font-weight: 500;">Selected City:</label>
+                                                        <select class="form-control" id="dropDownCitiesForDistricts"></select>
+                                                    </div>
+                                                </li>
+                                                <li>
+                                                    <div class="form-group d-flex ">
+                                                        <label class="col-form-label" style="width: 120px; display: flex; align-items: center; margin-bottom: 0; font-weight: 500;">Districts:</label>
+                                                        <select class="form-control" style="height: 300px;" size="3" id="dropDownDistricts"></select>
+                                                    </div>
+                                                </li>
+                                                <li>
+                                                    <form id="formDistrict">
+                                                        <div class="form-group d-flex ">
+                                                            <label style="width: 95px; display: flex; align-items: center; margin-bottom: 0; font-weight: 500;" id="labelDistrictName">District:</label>
+                                                            <div class="col-md">
+                                                                <input type="text" class="form-control" id="fieldDistrictName" required minlength="3" maxlength="30"/>
+                                                            </div>
+                                                            <div class="col-lg-4">
+                                                                <input class="btn btn-secondary mr-2" type="button" id="btnAddDistrict" value="Add">
+                                                                <input class="btn btn-secondary mr-2" type="button" id="btnUpdateDistrict" value="Update">
+                                                                <input class="btn btn-secondary mr-2" type="button" id="btnDeleteDistrict" value="Delete">
+                                                            </div>
+                                                        </div>
+                                                    </form>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                        <div class="tab-pane fade" id="pills-wards" role="tabpanel">
+                                            <ul class="ccontent">
+                                                <li>
+                                                    <div class="form-group d-flex ">
+                                                        <input class="btn btn-primary" type="button" id="btnLoadDistrictsForWards" value="Load District List">
+                                                    </div>
+                                                </li>
+                                                <li>
+                                                    <div class="form-group d-flex ">
+                                                        <label class="col-form-label" style="width: 120px; display: flex; align-items: center; margin-bottom: 0; font-weight: 500;">Selected District:</label>
+                                                        <select class="form-control" id="dropDownDistrictsForWards"></select>
+                                                    </div>
+                                                </li>
+                                                <li>
+                                                    <div class="form-group d-flex ">
+                                                        <label class="col-form-label" style="width: 120px; display: flex; align-items: center; margin-bottom: 0; font-weight: 500;">Wards:</label>
+                                                        <select class="form-control" style="height: 300px;" size="3" id="dropDownWards"></select>
+                                                    </div>
+                                                </li>
+                                                <li>
+                                                    <form id="formWard">
+                                                        <div class="form-group d-flex ">
+                                                            <label style="width: 95px; display: flex; align-items: center; margin-bottom: 0; font-weight: 500;" id="labelWardName">Ward:</label>
+                                                            <div class="col-md">
+                                                                <input type="text" class="form-control" id="fieldWardName" required minlength="3" maxlength="30"/>
+                                                            </div>
+                                                            <div class="col-lg-4">
+                                                                <input class="btn btn-secondary mr-2" type="button" id="btnAddWard" value="Add">
+                                                                <input class="btn btn-secondary mr-2" type="button" id="btnUpdateWard" value="Update">
+                                                                <input class="btn btn-secondary mr-2" type="button" id="btnDeleteWard" value="Delete">
+                                                            </div>
+                                                        </div>
+                                                    </form>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                        <div class="tab-pane fade" id="pills-mailserver" role="tabpanel">
+                                            <form th:action="@{/settings/save_mail_server}" method="post">
+                                                <ul class="ccontent">
+                                                    <li>
+                                                        <div class="form-group d-flex ">
+                                                            <label style="width: 410px; display: flex; align-items: center; margin-bottom: 0; font-weight: 500;">SMTP Server Host Name:</label>
+                                                            <input type="text" name="MAIL_HOST" th:value="${MAIL_HOST}" class="form-control" required>
+                                                        </div>
+                                                    </li>
+                                                    <li>
+                                                        <div class="form-group d-flex ">
+                                                            <label style="width: 410px; display: flex; align-items: center; margin-bottom: 0; font-weight: 500;">Port Number:</label>
+                                                            <input type="text" name="MAIL_PORT" th:value="${MAIL_PORT}" class="form-control" required>
+                                                        </div>
+                                                    </li>
+                                                    <li>
+                                                        <div class="form-group d-flex ">
+                                                            <label style="width: 410px; display: flex; align-items: center; margin-bottom: 0; font-weight: 500;">Username:</label>
+                                                            <input type="text" name="MAIL_USERNAME" th:value="${MAIL_USERNAME}" class="form-control" required>
+                                                        </div>
+                                                    </li>
+                                                    <li>
+                                                        <div class="form-group d-flex ">
+                                                            <label style="width: 410px; display: flex; align-items: center; margin-bottom: 0; font-weight: 500;">Password:</label>
+                                                            <input type="text" name="MAIL_PASSWORD" th:value="${MAIL_PASSWORD}" class="form-control" required>
+                                                        </div>
+                                                    </li>
+                                                    <li>
+                                                        <div class="form-group d-flex ">
+                                                            <label style="width: 410px; display: flex; align-items: center; margin-bottom: 0; font-weight: 500;">Server Authentication Required:</label>
+                                                            <select name="SMTP_AUTH" class="form-control">
+                                                                <option value="true" th:selected="${SMTP_AUTH} == 'true'">True</option>
+                                                                <option value="false" th:selected="${SMTP_AUTH} == 'false'">False</option>
+                                                            </select>
+                                                        </div>
+                                                    </li>
+                                                    <li>
+                                                        <div class="form-group d-flex ">
+                                                            <label style="width: 410px; display: flex; align-items: center; margin-bottom: 0; font-weight: 500;">Server Requires Secured Connection (TLS):</label>
+                                                            <select name="SMTP_SECURED" class="form-control">
+                                                                <option value="true" th:selected="${SMTP_SECURED} == 'true'">True</option>
+                                                                <option value="false" th:selected="${SMTP_SECURED} == 'false'">False</option>
+                                                            </select>
+                                                        </div>
+                                                    </li>
+                                                    <li>
+                                                        <div class="form-group d-flex ">
+                                                            <label style="width: 410px; display: flex; align-items: center; margin-bottom: 0; font-weight: 500;">Sender E-Mail:</label>
+                                                            <input type="text" name="MAIL_FROM" th:value="${MAIL_FROM}" class="form-control" required>
+                                                        </div>
+                                                    </li>
+                                                    <li>
+                                                        <div class="form-group d-flex ">
+                                                            <label style="width: 410px; display: flex; align-items: center; margin-bottom: 0; font-weight: 500;">Sender Name:</label>
+                                                            <input type="text" name="MAIL_SENDER_NAME" th:value="${MAIL_SENDER_NAME}" class="form-control" required>
+                                                        </div>
+                                                    </li>
+                                                </ul>
+                                                <div class="text-left">
+                                                    <input class="btn btn-primary m-3" type="submit" value="Save" />
+                                                </div>
+                                            </form>
+                                        </div>
+                                        <div class="tab-pane fade" id="pills-mailtemplate" role="tabpanel">
+                                            <form th:action="@{/settings/save_mail_templates}" method="post">
+                                                <ul class="nav nav-pills m-3 shadow-sm" id="setting-tab" role="tablist">
+                                                    <li class="nav-item">
+                                                        <a class="nav-link active" data-toggle="pill" href="#pills-customerVerification" role="tab">Customer Verification</a>
+                                                    </li>
+                                                    <li class="nav-item">
+                                                        <a class="nav-link" data-toggle="pill" href="#pills-orderConfirmation" role="tab">Order Confirmation</a>
+                                                    </li>
+                                                </ul>
+                                                <div class="tab-content">
+                                                    <div class="tab-pane fade show active" id="pills-customerVerification" role="tabpanel">
+                                                        <ul class="ccontent">
+                                                            <li>
+                                                                <div class="form-group d-flex ">
+                                                                    <label style="width: 410px; display: flex; align-items: center; margin-bottom: 0; font-weight: 500;">E-Mail Subject:</label>
+                                                                    <input type="text" name="CUSTOMER_VERIFY_SUBJECT" th:value="${CUSTOMER_VERIFY_SUBJECT}" class="form-control" required>
+                                                                </div>
+                                                            </li>
+                                                            <li>
+                                                                <div class="form-group d-flex ">
+                                                                    <label style="width: 410px; display: flex; align-items: center; margin-bottom: 0; font-weight: 500;">E-Mail Content:</label>
+                                                                    <textarea name="CUSTOMER_VERIFY_CONTENT" id="customerVerificationContent" rows="10">[[${CUSTOMER_VERIFY_CONTENT}]]</textarea>
+                                                                </div>
+                                                            </li>
+                                                        </ul>
+                                                    </div>
+                                                    <div class="tab-pane fade" id="pills-orderConfirmation" role="tabpanel">
+                                                        <ul class="ccontent">
+                                                            <li>
+                                                                <div class="form-group d-flex ">
+                                                                    <label style="width: 410px; display: flex; align-items: center; margin-bottom: 0; font-weight: 500;">E-Mail Subject:</label>
+                                                                    <input type="text" name="ORDER_CONFIRMATION_SUBJECT" th:value="${ORDER_CONFIRMATION_SUBJECT}" class="form-control" required>
+                                                                </div>
+                                                            </li>
+                                                            <li>
+                                                                <div class="form-group d-flex ">
+                                                                    <label style="width: 410px; display: flex; align-items: center; margin-bottom: 0; font-weight: 500;">E-Mail Content:</label>
+                                                                    <textarea name="ORDER_CONFIRMATION_CONTENT" id="orderConfirmationContent" rows="10">[[${ORDER_CONFIRMATION_CONTENT}]]</textarea>
+                                                                </div>
+                                                            </li>
+                                                        </ul>
+                                                    </div>
+                                                </div>
+                                                <div class="text-left">
+                                                    <input class="btn btn-primary m-3" type="submit" value="Save" />
+                                                </div>
+                                            </form>
+                                        </div>
+                                        <div class="tab-pane fade" id="pills-payment" role="tabpanel">
+                                            <form th:action="@{/settings/save_payment}" method="post">
+                                                <ul class="ccontent">
+                                                    <li>
+                                                        <div class="form-group d-flex ">
+                                                            <label style="width: 410px; display: flex; align-items: center; margin-bottom: 0; font-weight: 500;">Paypal API Base URL:</label>
+                                                            <input type="text" name="PAYPAL_API_BASE_URL" th:value="${PAYPAL_API_BASE_URL}" class="form-control" required>
+                                                        </div>
+                                                    </li>
+                                                    <li>
+                                                        <div class="form-group d-flex ">
+                                                            <label style="width: 410px; display: flex; align-items: center; margin-bottom: 0; font-weight: 500;">Paypal Client ID:</label>
+                                                            <input type="text" name="PAYPAL_API_CLIENT_ID" th:value="${PAYPAL_API_CLIENT_ID}" class="form-control" required>
+                                                        </div>
+                                                    </li>
+                                                    <li>
+                                                        <div class="form-group d-flex ">
+                                                            <label style="width: 410px; display: flex; align-items: center; margin-bottom: 0; font-weight: 500;">Paypal Client Secret:</label>
+                                                            <input type="text" name="PAYPAL_API_CLIENT_SECRET" th:value="${PAYPAL_API_CLIENT_SECRET}" class="form-control" required>
+                                                        </div>
+                                                    </li>
+                                                </ul>
+                                                <div class="text-left">
+                                                    <input class="btn btn-primary m-3" type="submit" value="Save" />
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Update Confirmation -->
+    <div class="modal fade text-center" id="confirmModal">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h4 class="modal-title" id="modalTitle">Update Confirmation</h4>
+					<button type="button" class="close" data-dismiss="modal">&times;</button>
+				</div>
+				<div class="modal-body">
+					<span id="confirmText"></span>
+				</div>
+				<div class="modal-footer">
+					<a type="button" class="btn btn-success" href="" id="btn-yes">Yes</a>
+					<button type="button" class="btn btn-danger" id="btn-no" data-dismiss="modal">No</button>
+				</div>
+			</div>
+		</div>
+	</div>
+
+    <!-- Delete Confirmation -->
+    <div class="modal fade text-center" id="confirmDeleteModalDialog">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h4 class="modal-title" id="modalTitle">Confirmation</h4>
+					<button type="button" class="close" data-dismiss="modal">&times;</button>
+				</div>
+				<div class="modal-body">
+					<span id="modalBody"></span>
+				</div>
+				<div class="modal-footer">
+					<a type="button" class="btn btn-danger" href="" id="btnYes">Yes</a>
+					<button type="button" class="btn btn-secondary" data-dismiss="modal">No</button>
+				</div>
+			</div>
+		</div>
+	</div>
+
+    <!-- Customer Detail Modal -->
+    <div class="modal fade" id="detailModal">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Order Detail Modal -->
+    <div class="modal fade" id="orderDetailModal">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+
+            </div>
+        </div>
+    </div>
+
+    <div class="text-center">
+        <p>[[${COPYRIGHT}]]</p>
+    </div>
+</body>
+
+</html>

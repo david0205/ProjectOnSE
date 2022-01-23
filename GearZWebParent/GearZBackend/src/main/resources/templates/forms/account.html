@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html xmlns:th="http://thymeleaf.org">
+
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+
+	<!-- Bootstrap CSS -->
+	<link rel="stylesheet" type="text/css" th:href="@{/webjars/bootstrap/css/bootstrap.min.css}">
+	<link rel="stylesheet" type="text/css" th:href="@{/webjars/font-awesome/css/all.css}">
+
+	<!-- Custom CSS -->
+	<link rel="stylesheet" type="text/css" th:href="@{/css/newuser.css}">
+
+	<title>Account Details</title>
+
+	<!-- JS -->
+	<script type="text/javascript" th:src="@{/webjars/jquery/jquery.min.js}"></script>
+	<script type="text/javascript" th:src="@{/webjars/bootstrap/js/bootstrap.min.js}"></script>
+	<script type="text/javascript" th:src="@{/js/main.js}"></script>
+	<script type="text/javascript" th:src="@{/js/user.js}"></script>
+</head>
+
+<body>
+	<div th:if="${success != null}" class="alert alert-success text-center">[[${success}]]</div>
+	<form th:action="@{/account/update}" th:object="${user}" enctype="multipart/form-data" method="POST">
+		<input type="hidden" th:field="*{id}"/>
+		<div class="adduser-container container">
+			<div class="adduser-top w-100">
+				<h2>Account Details</h2>
+			</div>
+			<div class="user-pic d-flex">
+				<div class="picture">
+					<img id="profilePic" th:src="@{${user.imagePath}}" alt="">
+				</div>
+				<div class="select-picture select-pic">
+					<input type="file" name="image" id="imageFile" accept="image/*"/>
+				</div>
+				<input type="hidden" th:field="*{profilePic}"/>
+			</div>
+			<div class="inputs d-flex">
+				<div class="form-group">
+					<input type="text" class="form-control" tabindex="1" th:field="*{firstName}"/>
+					<label class="form-control-placeholder" for="name">First Name</label>
+				</div>
+				<div class="form-group">
+					<input type="text" class="form-control" tabindex="2" th:field="*{lastName}"/>
+					<label class="form-control-placeholder" for="name">Last Name</label>
+				</div>
+				<div class="form-group">
+					<input type="email" class="form-control" tabindex="3" th:field="*{email}" readonly="readonly"/>
+					<label class="form-control-placeholder" for="password">Email</label>
+				</div>
+				<div class="form-group">
+					<input th:if="${user.id == null}" type="password" class="form-control" tabindex="4" th:field="*{password}" required  minlength="5"/>
+					<input th:if="${user.id != null}" type="password" class="form-control" tabindex="4" placeholder="Leave blank if you don't want to change password" th:field="*{password}" minlength="5"/>
+					<label class="form-control-placeholder" for="password">Password</label>
+				</div>
+			</div>
+			<div class="role-wrapper d-flex" th:with="roleOne=${roleList[0]},roleTwo=${roleList[1]},roleThree=${roleList[2]},roleFour=${roleList[3]},roleFive=${roleList[4]}">
+				<p class="role">Roles:</p>
+				<div class="radio-button w-100 d-flex">
+					<input class="checkbox1" type="checkbox" th:field="*{roles}" th:value="${roleOne.id}" id="radio-button-1" disabled="disabled"/>
+					<input class="checkbox2" type="checkbox" th:field="*{roles}" th:value="${roleTwo.id}" id="radio-button-2" disabled="disabled"/>
+					<input class="checkbox3" type="checkbox" th:field="*{roles}" th:value="${roleThree.id}" id="radio-button-3" disabled="disabled"/>
+					<label for="radio-button-1" class="option radio-button-1">
+						<div class="square"></div> <span th:text="${roleOne.role_name}"></span>
+					</label>
+					<label for="radio-button-2" class="option radio-button-2">
+						<div class="square"></div> <span th:text="${roleTwo.role_name}"></span>
+					</label>
+					<label for="radio-button-3" class="option radio-button-3">
+						<div class="square"></div> <span th:text="${roleThree.role_name}"></span>
+					</label>
+				</div>
+				<div class="radio-button2 w-100 d-flex">
+					<input class="checkbox4" type="checkbox" th:field="*{roles}" th:value="${roleFour.id}" id="radio-button-4" disabled="disabled"/>
+					<input class="checkbox5" type="checkbox" th:field="*{roles}" th:value="${roleFive.id}" id="radio-button-5" disabled="disabled"/>
+					<label for="radio-button-4" class="option radio-button-4">
+						<div class="square"></div> <span th:text="${roleFour.role_name}"></span>
+					</label>
+					<label for="radio-button-5" class="option radio-button-5">
+						<div class="square"></div> <span th:text="${roleFive.role_name}"></span>
+					</label>
+				</div>
+			</div>
+
+			<div class="checkbox-container w-100 d-flex">
+				<label class="checkbox-label" for="c1">Enabled</label>
+				<input type="checkbox" th:field="*{enabled}" disabled="disabled"/>
+			</div>
+
+			<div class="buttons w-100 d-flex">
+				<input class="button" type="submit" value="Save"/>
+				<input class="button" type="button" value="Cancel" id="btnCancel"/>
+			</div>
+		</div>
+	</form>
+	
+	<div class="modal fade text-center" id="modalDialog">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h4 class="modal-title" id="modalTitle">Warning</h4>
+					<button type="button" class="close" data-dismiss="modal">&times;</button>
+				</div>
+				<div class="modal-body">
+					<span id="modalBody"></span>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	
+</body>
+
+</html>

@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html xmlns:th="http://thymeleaf.org" xmlns:sec="http://thymeleaf.org/thymeleaf-extras-springsecurity5">
+
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+
+	<!-- Bootstrap CSS -->
+	<link rel="stylesheet" type="text/css" th:href="@{/webjars/bootstrap/css/bootstrap.min.css}">
+	<link rel="stylesheet" type="text/css" th:href="@{/webjars/font-awesome/css/all.css}">
+
+	<!-- Custom CSS -->
+	<link rel="stylesheet" type="text/css" th:href="@{/css/product.css}">
+
+	<!-- Rich text -->
+	<link rel="stylesheet" type="text/css" th:href="@{/richtext/richtext.min.css}">
+	
+	<title>[[${pageTitle}]]</title>
+	
+	<!-- Global JS -->
+	<script type="text/javascript">
+		contextPath = "[[@{/}]]"
+		var csrfHeaderName = "[[${_csrf.headerName}]]"
+        var csrfToken = "[[${_csrf.token}]]"
+	</script>
+
+	<!-- JS -->
+	<script type="text/javascript" th:src="@{/webjars/jquery/jquery.min.js}"></script>
+	<script type="text/javascript" th:src="@{/webjars/bootstrap/js/bootstrap.min.js}"></script>
+	<script type="text/javascript" th:src="@{/richtext/jquery.richtext.min.js}"></script>
+	<script type="text/javascript" th:src="@{/js/jquery.number.min.js}"></script>
+	<script type="text/javascript" th:src="@{/js/script.js}"></script>
+	<script type="text/javascript" th:src="@{/js/modal.js}"></script>
+	<script type="text/javascript" th:src="@{/js/append_list.js}"></script>
+	<script type="text/javascript" th:src="@{/js/order.js}"></script>
+
+</head>
+
+<body>
+
+	<div th:if="${success != null}" class="alert alert-success text-center">[[${success}]]</div>
+
+	<form th:action="@{/orders/save}" th:object="${order}" enctype="multipart/form-data" method="POST" onsubmit="return processFormBeforeSubmit();">
+		<input type="hidden" th:field="*{id}" />
+
+		<div class="container card shadow d-flex justify-content-center mt-5">
+			<div class="title w-100 text-center"
+				style="background-color: rgb(96, 96, 150); padding: 20px 0;color: #fff;">
+				<h2>[[${pageTitle}]]</h2>
+			</div>
+			<div class="container-content">
+				<!-- nav options -->
+				<ul class="nav nav-pills mb-3 shadow-sm" id="pills-tab" role="tablist">
+					<li class="nav-item">
+						<a class="nav-link active" data-toggle="pill" href="#pills-overview" role="tab">Overview</a>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link" data-toggle="pill" href="#pills-products" role="tab">Products</a>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link" data-toggle="pill" href="#pills-shipping" role="tab">Shipping</a>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link" data-toggle="pill" href="#pills-tracking" role="tab">Tracking</a>
+					</li>
+				</ul>
+				<!-- content -->
+				<div class="tab-content" id="pills-tabContent p-3">
+					<!-- 1st card: Overview -->
+					<div class="tab-pane fade show active" id="pills-overview" role="tabpanel">
+						<ul class="ccontent">
+							<li>
+								<div class="form-group d-flex ">
+									<label class="form-control-placeholder">Order ID:</label>
+									<input type="text" class="form-control" th:value="${order.id}" readonly>
+								</div>
+							</li>
+							<li>
+								<div class="form-group d-flex ">
+									<label class="form-control-placeholder">Customer:</label>
+									<input type="text" class="form-control" th:value="${order.customer.fullName}" readonly>
+								</div>
+							</li>
+							<li>
+								<div class="form-group d-flex ">
+									<label class="form-control-placeholder">Product Cost:</label>
+									<input type="text" class="form-control" th:field="*{productCost}" required>
+								</div>
+	
+							</li>
+							<li>
+								<div class="form-group d-flex ">
+									<label class="form-control-placeholder " for="name">Subtotal:</label>
+									<input type="text" class="form-control" th:field="*{subtotal}" required>
+									
+								</div>
+							</li>
+							<li>
+								<div class="form-group d-flex ">
+									<label class="form-control-placeholder " for="enabled">Shipping Cost:</label>
+									<input type="text" class="form-control" th:field="*{shippingCost}" required>
+								</div>
+							</li>
+							<li>
+								<div class="form-group d-flex ">
+									<label class="form-control-placeholder " for="inStock">Tax:</label>
+									<input type="text" class="form-control" th:field="*{tax}" required>
+								</div>
+							</li>
+							<li>
+								<div class="form-group d-flex ">
+									<label class="form-control-placeholder " for="price">Total:</label>
+									<input type="text" class="form-control" th:field="*{total}" required>
+								</div>
+							</li>
+							<li>
+								<div class="form-group d-flex ">
+									<label class="form-control-placeholder " for="price">Payment Method:</label>
+									<select class="custom-select form-control" th:field="*{paymentMethod}">
+										<option th:each="pm : ${T(com.gearz.common.entity.PaymentMethod).values()}" th:value="${pm}" th:text="${pm}"></option>
+									</select>
+								</div>
+							</li>
+							<li>
+								<div class="form-group d-flex ">
+									<label class="form-control-placeholder " for="price">Status:</label>
+									<select class="custom-select form-control" th:field="*{status}">
+										<option th:each="os : ${T(com.gearz.common.entity.OrderStatus).values()}" th:value="${os}" th:text="${os}"></option>
+									</select>
+								</div>
+							</li>
+	
+						</ul>
+					</div>
+					<!-- 2nd card: Products -->
+					<div class="tab-pane fade" id="pills-products" role="tabpanel">
+						<div id="productList">
+							<th:block th:each="detail, status : ${order.orderDetails}">
+							<div class="border rounded p-2" th:with="product = ${detail.product}" th:id="'row' + ${status.count}">
+								<input type="hidden" name="detailId" th:value="${detail.id}">
+								<input type="hidden" name="productId" th:value="${product.id}" class="hidden-product-id">
+								<div class="row">
+									<div class="col-1">
+										<div class="div-count">[[${status.count}]]</div>
+										<div><a href="" class="fas fa-trash text-muted link-remove-product" th:rowNumber="${status.count}"></a></div>
+									</div>
+									<div class="col-2">
+										<img th:src="@{${product.mainImagePath}}" class="img-fluid">
+									</div>
+									<b>[[${product.name}]]</b>
+								</div>
+								<div class="row m-1">
+									<table class="col">
+										<tr>
+											<td>Product Cost:&nbsp;</td>
+											<td>
+												<input type="text" name="_productCost" class="form-control m-1 input-prod-cost" required th:rowNumber="${status.count}" th:value="${detail.productCost}">
+											</td>
+										</tr>
+										<tr>
+											<td>Quantity:&nbsp;</td>
+											<td>
+												<input type="number" name="_quantity" step="1" th:rowNumber="${status.count}" class="form-control m-1 input-quantity" required th:id="'quantity' + ${status.count}" th:value="${detail.quantity}">
+											</td>
+										</tr>
+										<tr>
+											<td>Shipping Cost:&nbsp;</td>
+											<td>
+												<input type="text" name="_productShippingCost" class="form-control m-1 input-shipping-cost" required th:value="${detail.shippingCost}">
+											</td>
+										</tr>
+									</table>
+									<table class="col">
+										<tr>
+											<td>Unit Price:&nbsp;</td>
+											<td>
+												<input type="text" name="_productUnitPrice" class="form-control m-1 input-unit-price" th:rowNumber="${status.count}" required th:id="'price' + ${status.count}" th:value="${detail.unitPrice}">
+											</td>
+										</tr>
+										<tr>
+											<td>Subtotal:&nbsp;</td>
+											<td>
+												<input type="text" name="_productSubtotal" class="form-control m-1 input-subtotal" readonly th:id="'subtotal' + ${status.count}" th:value="${detail.subtotal}">
+											</td>
+										</tr>
+									</table>
+								</div>
+							</div>
+							<div th:id="'blankLine' + ${status.count}" class="row">&nbsp;</div>
+							</th:block>
+						</div>
+						<a id="add-product-btn" class="btn btn-success" th:href="@{/orders/search_product}">Add product</a>
+					</div>
+					<!-- 3nd card: Shipping -->
+					<div class="tab-pane fade" id="pills-shipping" role="tabpanel">
+						<ul class="ccontent">
+							<li>
+								<div class="form-group d-flex ">
+									<label class="form-control-placeholder">Estimated Delivery Day(s):</label>
+									<input type="text" class="form-control" th:field="*{estimatedDeliveryDays}" required>
+								</div>
+							</li>
+							<li>
+								<div class="form-group d-flex ">
+
+									<label class="form-control-placeholder">Expected Delivery Date:</label>
+									<input type="date" class="form-control" th:field="*{deliveryCompleteDateOnForm}" required>
+								</div>
+							</li>
+							<li>
+								<div class="form-group d-flex ">
+									<label class="form-control-placeholder">Recipient Name:</label>
+									<input type="text" class="form-control" th:field="*{fullName}" required>
+								</div>
+	
+							</li>
+							<li>
+								<div class="form-group d-flex ">
+									<label class="form-control-placeholder " for="name">Telephone:</label>
+									<input type="text" class="form-control" th:field="*{phoneNumber}" required>
+									
+								</div>
+							</li>
+							<li>
+								<div class="form-group d-flex ">
+									<label class="form-control-placeholder " for="enabled">Address Line:</label>
+									<input type="text" class="form-control" th:field="*{addressLine}" required>
+								</div>
+							</li>
+							<li>
+								<div class="form-group d-flex ">
+									<label class="form-control-placeholder " for="inStock">Ward:</label>
+									<input type="hidden" name="wardName" id="wardName" th:value="${order.ward}">
+									<select class="custom-select form-control" id="listWard">
+										<option th:each="ward : ${wards}" th:value="${ward.id}" th:selected="${ward.name == order.ward}">[[${ward.name}]]</option>
+									</select>
+								</div>
+							</li>
+							<li>
+								<div class="form-group d-flex ">
+									<label class="form-control-placeholder " for="inStock">District:</label>
+									<input type="hidden" name="districtName" id="districtName" th:value="${order.district}">
+									<select class="custom-select form-control" id="listDistrict">
+										<option th:each="district : ${districts}" th:value="${district.id}" th:selected="${district.name == order.district}">[[${district.name}]]</option>
+									</select>
+								</div>
+							</li>
+							<li>
+								<div class="form-group d-flex ">
+									<label class="form-control-placeholder " for="price">City:</label>
+									<input type="hidden" name="cityName" id="cityName" th:value="${order.city}">
+									<select class="custom-select form-control" id="city">
+										<option th:each="city : ${cities}" th:value="${city.id}" th:selected="${city.name == order.city}">[[${city.name}]]</option>
+									</select>
+								</div>
+							</li>
+						</ul>
+					</div>
+					<!-- 3nd card: Tracking -->
+					<div class="tab-pane fade" id="pills-tracking" role="tabpanel">
+						<div id="trackingList">
+							<th:block th:each="tracking, status : ${order.orderTrackings}">
+							<div class="border rounded p-2" th:id="'rowTracking' + ${status.count}" th:with="isStatusNew = ${tracking.status.toString() == 'NEW'}">
+								<input type="hidden" name="trackingId" th:value="${tracking.id}" class="hidden-tracking-id">
+								<div class="col-2">
+									<div class="div-count-tracking">[[${status.count}]]</div>
+									<th:block th:if="${!isStatusNew}">
+									<div class="mt-1">
+										<a href="" class="fas fa-trash text-muted link-remove-tracking" th:rowNumber="${status.count}"></a>
+									</div>
+									</th:block>
+								</div>
+								<div class="col-10">
+									<div class="form-group row">
+										<label class="col-form-label">Time:</label>
+										<div class="col">
+											<input type="datetime-local" name="trackingDate" th:value="${tracking.updatedTimeOnForm}" class="form-control"
+													th:readonly="${isStatusNew}" th:required="${!isStatusNew}">
+										</div>
+									</div>
+									
+									<div class="form-group row">
+										<label class="col-form-label">Status:</label>
+										<div class="col">
+											<th:block th:if="${isStatusNew}">
+											<input type="hidden" name="trackingStatus" value="NEW">
+											</th:block>
+											<select name="trackingStatus" class="form-control dropDownStatus" th:id="${isStatusNew ? 'trackingStatusOptions' : ''}"
+													th:rowNumber="${status.count}" th:disabled="${isStatusNew}">
+												<th:block th:each="os : ${T(com.gearz.common.entity.OrderStatus).values()}">
+												<option th:value="${os}" th:text="${os}" th:selected="${os == tracking.status}" th:defaultDescription="${os.defaultDescription}"></option>
+												</th:block>
+											</select>
+										</div>
+									</div>
+
+									<div class="form-group row">
+										<label class="col-form-label">Detail:</label>
+										<div class="col">
+											<textarea class="form-control" name="trackingDetail" th:id="'trackingDetail' + ${status.count}" cols="10" rows="2" th:readonly="${isStatusNew}" required>[[${tracking.statusDetail}]]</textarea>
+										</div>
+									</div>
+								</div>
+							</div>
+							<div th:id="'emptyLine' + ${status.count}" class="row">&nbsp;</div>
+							</th:block>
+						</div>
+						<button id="link-add-tracking" type="button" class="btn btn-primary">Add Tracking Record</button>
+					</div>
+			</div>
+		</div>
+		
+
+		<div class="buttons w-100 d-flex">
+			<div class=" button-div ">
+				<input class="save-button" type="submit" value="Save">
+	            <input class="cancel-button" type="button" value="Cancel" id="btnCancel">
+			</div>
+		</div>
+
+	</form>
+
+	<div class="modal fade text-center" id="modalDialog">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h4 class="modal-title" id="modalTitle">Warning</h4>
+					<button type="button" class="close" data-dismiss="modal">&times;</button>
+				</div>
+				<div class="modal-body">
+					<span id="modalBody"></span>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="modal fade text-center" id="addProductModal">
+		<div class="modal-dialog modal-lg">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h4 class="modal-title" id="modalTitle">Add Product</h4>
+					<button type="button" class="close" data-dismiss="modal">&times;</button>
+				</div>
+				<div class="embed-responsive embed-responsive-16by9">
+					<iframe class="embed-responsive-item" src=""></iframe>
+				  </div>
+				<div class="modal-footer">
+					<a type="button" class="btn btn-danger" href="" id="btnYes">Close</a>
+				</div>
+			</div>
+		</div>
+	</div>
+</body>
+
+</html>

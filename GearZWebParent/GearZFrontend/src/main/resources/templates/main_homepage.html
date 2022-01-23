@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html xmlns:th="http://thymeleaf.org">
+<body>
+    <div th:fragment="main">
+        <main>
+            <div class="header-video">
+                <div id="hero_video">
+                    <div class="opacity-mask d-flex align-items-center" data-opacity-mask="rgba(0, 0, 0, 0.5)">
+                        <div class="container">
+                            <div class="row justify-content-center justify-content-md-start">
+                                <div class="col-lg-6">
+                                    <div class="slide-text white">
+                                        <h3>Welcome To<br>GearZ</h3>
+                                        <p>Get yourself updated with latest hardwares</p>
+                                        <a class="btn_1" href="#0" role="button">Shop Now</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <img th:src="@{img/video_fix.png}" alt="" class="header-video--media" data-video-src="video/intro" data-teaser-source="video/intro" data-provider="" data-video-width="1920" data-video-height="960">
+            </div>
+            <!-- /header-video -->
+    
+            <div class="feat">
+                <div class="container">
+                    <ul>
+                        <li>
+                            <div class="box">
+                                <i class="ti-wallet"></i>
+                                <div class="justify-content-center">
+                                    <h3>Secure Payment</h3>
+                                    <p>100% secure payment</p>
+                                </div>
+                            </div>
+                        </li>
+                        <li>
+                            <div class="box">
+                                <i class="ti-headphone-alt"></i>
+                                <div class="justify-content-center">
+                                    <h3>24/7 Support</h3>
+                                    <p>Online top support</p>
+                                </div>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <!--/feat-->
+            
+            <div class="container margin_60_35">
+                <div class="row small-gutters categories_grid">
+                    <div class="col-sm-12 col-md-6">
+                        <a th:href="@{'/c/gaming-desktops'}">
+                            <img src="img/img_cat_home_1_placeholder.png" data-src="img/gaming-pc.jpg" alt="" class="img-fluid lazy">
+                            <div class="wrapper">
+                                <h2>New Gaming PCs</h2>
+                                <p>115 Products</p>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="col-sm-12 col-md-6">
+                        <div class="row small-gutters mt-md-0 mt-sm-2">
+                            <div class="col-sm-6">
+                                <a th:href="@{'/c/audio'}">
+                                    <img src="img/img_cat_home_2_placeholder.png" data-src="img/audio.jpg" alt="" class="img-fluid lazy">
+                                    <div class="wrapper">
+                                        <h2>Audio</h2>
+                                        <p>150 Products</p>
+                                    </div>
+                                </a>
+                            </div>
+                            <div class="col-sm-6">
+                                <a th:href="@{'/c/pc-peripherals'}">
+                                    <img src="img/img_cat_home_2_placeholder.png" data-src="img/gaming-gear.jpg" alt="" class="img-fluid lazy">
+                                    <div class="wrapper">
+                                        <h2>Peripherals</h2>
+                                        <p>90 Products</p>
+                                    </div>
+                                </a>
+                            </div>
+                            <div class="col-sm-12 mt-sm-2">
+                                <a th:href="@{'/c/laptops'}">
+                                    <img src="img/img_cat_home_4_placeholder.png" data-src="img/laptops.jpg" alt="" class="img-fluid lazy">
+                                    <div class="wrapper">
+                                        <h2>Laptops</h2>
+                                        <p>120 Products</p>
+                                    </div>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!--/categories_grid-->
+            </div>
+            <!-- /container -->
+    
+            <hr class="mb-0">
+            
+            <div class="container margin_60_35" style="position: relative;">
+                <div class="main_title">
+                    <h2>Featured</h2>
+                    <span>Products</span>
+                    <!-- <p>Cum doctus civibus efficiantur in imperdiet deterruisset</p> -->
+                </div>
+                <div class="owl-carousel owl-theme products_carousel">
+                    <th:block th:each="p : ${products}">
+                        <div class="item">
+                            <div class="grid_item">
+                                <span th:if="${p.discountPercentage == 0}" class="ribbon new">New</span>
+                                <span th:if="${p.discountPercentage != 0}" class="ribbon off">-[[${#numbers.formatDecimal(p.discountPercentage, 0, 'COMMA', 0, 'DEFAULT')}]]%</span>
+                                <figure>
+                                    <a th:href="@{'/products/' + ${p.tag}}">
+                                        <img class="owl-lazy" src="img/products/product_placeholder_square_medium.jpg" th:data-src="@{${p.mainImagePath}}" alt="">
+                                    </a>
+                                </figure>
+                                <div class="rating"><i class="icon-star voted"></i><i class="icon-star voted"></i><i class="icon-star voted"></i><i class="icon-star voted"></i><i class="icon-star"></i></div>
+                                <a th:href="@{'/products/' + ${p.tag}}">
+                                    <h3>[[${p.name}]]</h3>
+                                </a>
+                                <div th:if="${p.discountPercentage <= 0}" class="price_box">
+                                    <span class="new_price">$[[${#numbers.formatDecimal(p.price, 1, 'DEFAULT', 2, 'POINT')}]]</span>
+                                </div>
+                                <div th:if="${p.discountPercentage > 0}" class="price_box">
+                                    <span class="new_price">$[[${#numbers.formatDecimal(p.discountedPrice, 1, 'DEFAULT', 2, 'POINT')}]]</span>
+                                    <span class="old_price">$[[${#numbers.formatDecimal(p.price, 1, 'DEFAULT', 2, 'POINT')}]]</span>
+                                </div>
+                                <ul>
+                                    <li><a th:id="${p.id}" class="tooltip-1" data-toggle="tooltip" data-placement="left" title="Add to favorites"><i class="ti-heart"></i><span>Add to favorites</span></a></li>
+                                    <li><a th:id="${p.id}" class="tooltip-1" data-toggle="tooltip" data-placement="left" title="Add to compare"><i class="ti-control-shuffle"></i><span>Add to compare</span></a></li>
+                                    <li th:if="${p.inStock}"><a th:id="${p.id}" class="tooltip-1 add-to-cart-btn-home-product-listing" data-toggle="tooltip" data-placement="left" title="Add to cart"><i class="ti-shopping-cart"></i><span>Add to cart</span></a></li>
+                                </ul>
+                            </div>
+                            <!-- /grid_item -->
+                        </div>
+                        <!-- /item -->
+                    </th:block>
+                </div>
+                <!-- /products_carousel -->
+                <div class="toast" data-delay="10000" data-animation="true" role="alert" aria-live="assertive" aria-atomic="true" style="position: absolute; top: 0; right: 0; margin-top: 20px; min-width: 400px;">
+                    <div class="toast-header">
+                        <svg class=" rounded mr-2" width="20" height="20" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice" focusable="false" role="img">
+                            <rect fill="#007aff" width="100%" height="100%" /></svg>
+                        <strong class="mr-auto">Notification</strong>
+                        <button type="button" class="ml-2 mb-1 close" data-dismiss="toast" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="toast-body">
+                        
+                    </div>
+                </div>
+            </div>
+            <!-- /container -->
+            
+            <div class="bg_gray">
+                <div class="container margin_30">
+                    <div id="brands" class="owl-carousel owl-theme">
+                        <th:block th:each="brand : ${listBrands}">
+                            <div class="item">
+                                <a href="#0"><img th:src="@{/img/brands/placeholder_brands.png}" th:data-src="@{${brand.logoPath}}" alt="" class="owl-lazy"></a>
+                            </div><!-- /item -->
+                        </th:block>
+                    </div><!-- /carousel -->
+                </div><!-- /container -->
+            </div>
+            <!-- /bg_gray -->
+            
+        </main>
+        <!-- /main -->
+    
+    </div>
+</body>
+</html>

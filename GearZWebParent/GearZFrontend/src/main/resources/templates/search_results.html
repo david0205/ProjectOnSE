@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html xmlns:th="http://thymeleaf.org">
+<head>
+    <th:block th:replace="fragments :: page_head('Results for keyword: ' + ${keyword}, 'none')"></th:block>
+    <link th:href="@{/css/listing.css}" rel="stylesheet">
+    <script>
+        var csrfHeaderName = "[[${_csrf.headerName}]]"
+        var csrfToken = "[[${_csrf.token}]]"
+    </script>
+</head>
+<body>
+    <div id="page">
+        <header th:replace="fragments :: header"></header>
+
+        <main>
+            <div class="top_banner">
+                <div class="opacity-mask d-flex align-items-center" data-opacity-mask="rgba(0, 0, 0, 0.3)">
+                    <div class="container">                        
+                        <h1>Showing results for '[[${keyword}]]'</h1>
+                    </div>
+                </div>
+                <img th:src="@{/img/cat-search-on-google.jpg}" class="img-fluid" alt="">
+            </div>
+            <!-- /top_banner -->
+            <div id="stick_here"></div>
+            <div class="container margin_30" style="position: relative;">
+                <div class="row">
+                    <div class="col-lg-9">
+                        <th:block th:each="result : ${results}">
+                            <div class="row row_item">
+                                <div class="col-sm-4">
+                                    <figure>
+                                        <span th:if="${result.discountPercentage == 0}" class="ribbon new">New</span>
+                                        <span th:if="${result.discountPercentage != 0}" class="ribbon off">-[[${#numbers.formatDecimal(result.discountPercentage, 0, 'COMMA', 0, 'DEFAULT')}]]%</span>
+                                        <a th:href="@{'/products/' + ${result.tag}}">
+                                            <img class="img-fluid lazy" src="img/products/product_placeholder_square_medium.jpg" th:data-src="@{${result.mainImagePath}}" alt="">
+                                        </a>
+                                    </figure>
+                                </div>
+                                <div class="col-sm-8">
+                                    <div class="rating"><i class="icon-star voted"></i><i class="icon-star voted"></i><i class="icon-star voted"></i><i class="icon-star voted"></i><i class="icon-star"></i></div>
+                                    <a th:href="@{'/products/' + ${result.tag}}">
+                                        <h3>[[${result.name}]]</h3>
+                                    </a>
+                                    <div th:utext="${result.shortDescription}"></div>
+                                    <div th:if="${result.discountPercentage <= 0}" class="price_box">
+                                        <span class="new_price">$[[${#numbers.formatDecimal(result.price, 1, 'DEFAULT', 2, 'POINT')}]]</span>
+
+                                    </div>
+                                    <div th:if="${result.discountPercentage > 0}" class="price_box">
+                                        <span class="new_price">$[[${#numbers.formatDecimal(result.discountedPrice, 1, 'DEFAULT', 2, 'POINT')}]]</span>
+                                        <span class="old_price">$[[${#numbers.formatDecimal(result.price, 1, 'DEFAULT', 2, 'POINT')}]]</span>
+                                    </div>
+                                    <ul>
+                                        <li><a class="btn_1 add-to-cart-btn-search-listing" th:id="${result.id}">Add to cart</a></li>
+                                        <li><a href="#0" class="btn_1 gray tooltip-1" data-toggle="tooltip" data-placement="top" title="Add to favorites"><i class="ti-heart"></i><span>Add to favorites</span></a></li>
+                                        <li><a href="#0" class="btn_1 gray tooltip-1" data-toggle="tooltip" data-placement="top" title="Add to compare"><i class="ti-control-shuffle"></i><span>Add to compare</span></a></li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <!-- /row_item -->
+                        </th:block>
+                        <div class="pagination__wrapper">
+                            <ul class="pagination">
+                                <li><a th:if="${currentPage > 1}" th:href="@{/search/page/1}" class="prev" title="first page">&#10094;&#10094;</a></li>
+                                <li><a th:if="${currentPage > 1}" th:href="@{'/search/page/' + ${currentPage - 1}}" class="prev" title="previous page">&#10094;</a></li>
+                                <li th:each="i : ${#numbers.sequence(1, totalPages)}">
+                                    <a th:href="@{'/search/page/' + ${i}}" th:class="${currentPage != i ? ' ' : 'active'}" >[[${i}]]</a>
+                                </li>
+                                <li><a th:if="${currentPage < totalPages}" th:href="@{'/search/page/' + ${currentPage + 1}}" class="next" title="next page">&#10095;</a></li>
+                                <li><a th:if="${currentPage < totalPages}" th:href="@{'/search/page/' + ${totalPages}}" class="next" title="last page">&#10095;&#10095;</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                    <!-- /col -->
+                </div>
+                <!-- /row -->
+                <div class="toast" data-delay="10000" data-animation="true" role="alert" aria-live="assertive" aria-atomic="true" style="position: absolute; margin-top: 200px; top: 0; right: 0; min-width: 400px;">
+                    <div class="toast-header">
+                        <svg class=" rounded mr-2" width="20" height="20" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice" focusable="false" role="img">
+                            <rect fill="#007aff" width="100%" height="100%" /></svg>
+                        <strong class="mr-auto">Notification</strong>
+                        <button type="button" class="ml-2 mb-1 close" data-dismiss="toast" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="toast-body">
+                        
+                    </div>
+                </div>
+                <!-- /toast -->
+            </div>
+            <!-- /container -->
+        </main>
+        <!-- /main -->
+    
+
+		<footer th:replace="fragments :: footer"></footer>		
+
+    </div>
+    <div id="toTop"></div><!-- Back to top button -->
+	
+	<!-- COMMON SCRIPTS -->
+    <script th:src="@{/js/common_scripts.min.js}"></script>
+    <script th:src="@{/js/main.js}"></script>
+
+    <!-- SPECIFIC SCRIPTS -->
+	<script th:src="@{/js/sticky_sidebar.min.js}"></script>
+	<script th:src="@{/js/specific_listing.js}"></script>
+	<script th:src="@{/js/cart.js}"></script>
+
+</body>
+</html>

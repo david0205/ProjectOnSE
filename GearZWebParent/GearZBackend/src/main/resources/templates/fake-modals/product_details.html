@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html xmlns:th="http://thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Bootstrap CSS -->
+	<link rel="stylesheet" type="text/css" th:href="@{/webjars/bootstrap/css/bootstrap.min.css}">
+	<link rel="stylesheet" type="text/css" th:href="@{/webjars/font-awesome/css/all.css}">
+    
+	<!-- Custom CSS -->
+	<link rel="stylesheet" type="text/css" th:href="@{/css/product.css}">
+    
+	<!-- Rich text -->
+	<link rel="stylesheet" type="text/css" th:href="@{/richtext/richtext.min.css}">
+    
+    <title>Product details</title>
+
+    <script type="text/javascript" th:src="@{/webjars/jquery/jquery.min.js}"></script>
+	<script type="text/javascript" th:src="@{/webjars/bootstrap/js/bootstrap.min.js}"></script>
+	<script type="text/javascript" th:src="@{/richtext/jquery.richtext.min.js}"></script>
+    <!-- <script type="text/javascript" th:src="@{/js/product/product.js}"></script> -->
+</head>
+<body>
+    <div class="container card shadow d-flex justify-content-center mt-5">
+        <div class="title w-100 text-center"
+            style="background-color: rgb(96, 96, 150); padding: 20px 0;color: #fff;">
+            <h2>[[${pageTitle}]]</h2>
+        </div>
+        <div class="container-content">
+            <!-- nav options -->
+            <ul class="nav nav-pills mb-3 shadow-sm" id="pills-tab" role="tablist">
+                <li>
+                    <a class="nav-link active" data-toggle="pill" href="#pills-overview" role="tab">Overview</a>
+                </li>
+                <li>
+                    <a class="nav-link" data-toggle="pill" href="#pills-images" role="tab">Images</a>
+                </li>
+                <li>
+                    <a class="nav-link" data-toggle="pill" href="#pills-description" role="tab">Description</a>
+                </li>
+                <li>
+                    <a class="nav-link" data-toggle="pill" href="#pills-specifications" role="tab">Details</a>
+                </li>
+                <li>
+                    <a class="nav-link" data-toggle="pill" href="#pills-shipping" role="tab">Shipping</a>
+                </li>
+            </ul>
+            <!-- content -->
+            <div class="tab-content" id="pills-tabContent p-3">
+                <!-- 1st card: Overview -->
+                <div class="tab-pane fade show active" id="pills-overview" role="tabpanel">
+                    <ul class="ccontent">
+                        <li>
+                            <div class="form-group d-flex ">
+                                <label class="form-control-placeholder " for="name">Product Name:</label>
+                                <input type="text" id="name" class="form-control" th:value="${product.name}" readonly/>
+                            </div>
+                        </li>
+                        <li>
+                            <div class="form-group d-flex ">
+                                <label class="form-control-placeholder " for="tag">Tag:</label>
+                                <input type="text" id="tag" class="form-control" th:value="${product.tag}" readonly/>
+                            </div>
+                        </li>
+                        <li>
+                            <div class="form-group d-flex ">
+                                <label class="form-control-placeholder ">Brand:</label>
+                                <input type="text" class="form-control" th:value="${product.brand.name}" readonly/>
+                            </div>
+                        </li>
+                        <li>
+                            <div class="form-group d-flex ">
+                                <label class="form-control-placeholder " for="name">Category:</label>
+                                <input type="text" class="form-control" th:value="${product.category.name}" readonly/>
+                            </div>
+                        </li>
+                        <li>
+                            <div class="form-group d-flex ">
+                                <label class="form-control-placeholder " for="enabled">Enabled:</label>
+                                <input type="checkbox" th:checked="${product.enabled}" class="form-control1" onclick="return false;"/>
+                            </div>
+                        </li>
+                        <li>
+                            <div class="form-group d-flex ">
+                                <label class="form-control-placeholder " for="inStock">In stock:</label>
+                                <input type="checkbox" th:checked="${product.inStock}" class="form-control1" onclick="return false;"/>
+                            </div>
+                        </li>
+                        <li>
+                            <div class="form-group d-flex ">
+                                <label class="form-control-placeholder " for="price">List price:</label>
+                                <input type="text" class="form-control" th:value="${product.price}" readonly/>
+                            </div>
+                        </li>
+                        <li>
+                            <div class="form-group d-flex ">
+                                <label class="form-control-placeholder " for="discountPercentage">Discount:</label>
+                                <input type="text" class="form-control" th:value="${product.discountPercentage}" readonly/>
+                            </div>
+                        </li>
+                        <li>
+                            <div class="form-group d-flex ">
+                                <label class="form-control-placeholder ">Updated Time:</label>
+                                <span class="form-control">[[${#dates.format(product.updatedTime, 'yyyy-MM-dd HH:mm:ss')}]]</span>
+                            </div>
+                        </li>
+        
+                    </ul>
+                </div>
+                <!-- 2nd card: Images -->
+                <div class="tab-pane fade" id="pills-images" role="tabpanel">
+                    <div class="tab-container d-flex justify-content-between">
+                        <div id="main_container">
+                            <div class="floated_box">
+                                <div class="img-formgroup form-group border text-center rounded mr-2 d-block">
+                                    <div class="mb-2">
+                                        <label>Main Image&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>
+                                    </div>
+                                    <img th:src="@{${product.mainImagePath}}" alt="">
+                                    <p>[[${product.mainImage}]]</p>
+                                </div>
+                            </div>
+
+                            <th:block th:each="productImage, status : ${product.images}">
+                                <div class="floated_box">
+                                    <div class="img-formgroup form-group border text-center rounded mr-2 d-block">
+                                        <div class="mb-2">
+                                            <label for="imageFile">Extra Image #[[${status.index + 1}]]</label>
+                                        </div>
+                                        <img th:src="@{${productImage.imagePath}}" alt="">
+                                        <p>[[${productImage.image}]]</p>
+                                    </div>
+                                </div>
+                            </th:block>
+                        </div>
+                    </div>
+                </div>
+                <!-- 3nd card: Description -->
+                <div class="tab-pane fade" id="pills-description" role="tabpanel">
+                    <div class="form-group">
+                        <label for="shortDescription">Short description:</label><br>
+                        <div class="border border-primary rounded p-2 m-2" th:utext="${product.shortDescription}"></div>
+                    </div>
+                    <div class="form-group">
+                        <label for="fullDescription">Full description:</label><br>
+                        <div class="border border-primary rounded p-2 m-2" th:utext="${product.fullDescription}"></div>
+                    </div>
+                </div>
+                <!-- 4th card: Specifications -->
+                <div class="tab-pane fade" id="pills-specifications" role="tabpanel">
+                    <div>
+                        <table class="table table-striped table-bordered table-hover">
+                            <thead class="thead-dark">
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Value</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="spec : ${product.specs}">
+                                    <td>[[${spec.name}]]</td>
+                                    <td>[[${spec.value}]]</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <!-- 5th card: Shipping -->
+                <div class="tab-pane fade" id="pills-shipping" role="tabpanel">
+                    <div class="form-group d-flex ">
+                        <label class="form-control-placeholder " for="length">Length:</label>
+                        <input type="text" th:value="${product.length}" class="form-control" readonly>
+                    </div>
+                    <div class="form-group d-flex ">
+                        <label class="form-control-placeholder " for="width">Width:</label>
+                        <input type="text" th:value="${product.width}" class="form-control" readonly>
+                    </div>
+                    <div class="form-group d-flex ">
+                        <label class="form-control-placeholder " for="height">Height:</label>
+                        <input type="text" th:value="${product.height}" class="form-control" readonly>
+                    </div>
+                    <div class="form-group d-flex ">
+                        <label class="form-control-placeholder " for="weight">Weight:</label>
+                        <input type="text" th:value="${product.weight}" class="form-control" readonly>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+</body>
+</html>

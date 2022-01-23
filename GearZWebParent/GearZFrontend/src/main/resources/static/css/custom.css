@@ -1,0 +1,36 @@
+/*============================================================================================*/
+/* Your custom styles below */
+/*============================================================================================*/
+.list {
+    max-height: 200px;
+    overflow-y: scroll !important;
+}
+
+.verify-fail.icon-box {
+	color: #f33;		
+	width: 95px;
+	height: 95px;
+	display: inline-block;
+	border-radius: 50%;
+	z-index: 9;
+	border: 5px solid #f33;
+	padding: 15px;
+	text-align: center;
+}
+
+.verify-success.icon-box {
+	color: #8EC343;		
+	width: 95px;
+	height: 95px;
+	display: inline-block;
+	border-radius: 50%;
+	z-index: 9;
+	border: 5px solid #8EC343;
+	padding: 15px;
+	text-align: center;
+}
+
+.icon-box i {
+	font-size: 64px;
+	margin: -4px 0 0 -4px;
+}
